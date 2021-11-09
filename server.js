@@ -1,4 +1,5 @@
-require("./init")();
+const reset = require("./reset");
+reset();
 
 const helper = require("./helper");
 const express = require("express");
