@@ -16,11 +16,13 @@ app.get("/", function (req, res) {
     res.send("<h1>ECE416 Project 2 Team 14</h1>");
 });
 
-const USER_END = config.USERS_ENDPOINT;
-const PACKAGE_END = config.PACKAGE_ENDPOINT;
-const LOG_END = config.LOG_ENDPOINT;
+const USER_END = config.USER_KEY;
+const PACKAGE_END = config.PACKAGE_KEY;
+const LOG_END = config.LOG_KEY;
 
 app.put(`/${USER_END}/authenticate`, APIusers.authenticate);
+
+app.post(`/${USER_END}/create`, APIusers.createNewUser);
 
 app.listen(process.env.PORT || 3000, () =>
     console.log(`Server is running on port ${process.env.PORT || 3000}`)
