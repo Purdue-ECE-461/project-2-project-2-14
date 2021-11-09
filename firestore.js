@@ -1,7 +1,10 @@
+const config = require("./config");
 const Firestore = require("@google-cloud/firestore");
 const path = require("path");
 
-const USERCOL = "users";
+const USERCOLL = config.USERS_ENDPOINT;
+const PACKAGECOLL = config.PACKAGE_ENDPOINT;
+const LOGCOLL = config.LOG_ENDPOINT;
 
 class FirestoreClient {
     constructor() {
@@ -45,7 +48,7 @@ class Database {
     }
 
     async saveUser(name, password, isAdmin) {
-        this.fs.save(USERCOL, name, {
+        this.fs.save(USERCOLL, name, {
             name: name,
             passwordHash: password,
             isAdmin: isAdmin,
@@ -58,11 +61,11 @@ class Database {
     }
 
     async updateUser(name, userData) {
-        await this.fs.saveByPath(`${USERCOL}/${name}`, userData);
+        await this.fs.saveByPath(`${USERCOLL}/${name}`, userData);
     }
 
     async getUser(name) {
-        const response = await this.fs.getByPath(`${USERCOL}/${name}`);
+        const response = await this.fs.getByPath(`${USERCOLL}/${name}`);
         return response.data();
     }
 }
