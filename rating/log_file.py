@@ -11,7 +11,6 @@ class LogLevel(Enum):
 
 class Log:
     level = LogLevel.SILENT
-    logFile = 'project-1-13.log'
     levelTranslate = {
         LogLevel.SILENT: logging.NOTSET,
         LogLevel.INFO: logging.INFO,

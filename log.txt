@@ -1,0 +1,66 @@
+2021-11-13 16:26:48,669 INFO: logger created
+2021-11-13 16:26:48,670 INFO: Modules intialized
+2021-11-13 16:26:48,670 INFO: URLs retrieved
+2021-11-13 16:26:48,670 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 16:26:48,670 INFO: Repository has been cloned
+2021-11-13 16:26:49,525 INFO: Subscore Complete - Rampup
+2021-11-13 16:26:49,798 INFO: Source pull confirmed
+2021-11-13 16:27:00,437 INFO: Pulls initiative completed
+2021-11-13 16:27:00,438 INFO: Stars initiative completed
+2021-11-13 16:27:00,438 INFO: Subscore Complete - Correctness
+2021-11-13 16:27:00,438 INFO: Contributors aquired
+2021-11-13 16:27:01,451 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 16:27:01,451 INFO: Subscore Complete - Busfactor
+2021-11-13 16:27:02,230 INFO: Data aquired **Issues and Last Commit
+2021-11-13 16:27:13,561 INFO: Issue sub-subscore acheived
+2021-11-13 16:27:13,562 INFO: Commit sub-subscore acheived
+2021-11-13 16:27:13,562 INFO: Subscore Complete - Responsiveness
+2021-11-13 16:27:13,809 INFO: Subscore Complete - License
+2021-11-13 16:27:13,960 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 16:27:13,960 INFO: All repo scores calculated
+2021-11-13 16:27:13,960 INFO: Sorting repos...
+2021-11-13 16:27:13,960 INFO: Sorted repos
+2021-11-13 16:29:03,792 INFO: logger created
+2021-11-13 16:29:03,793 INFO: Modules intialized
+2021-11-13 16:29:03,794 INFO: URLs retrieved
+2021-11-13 16:29:03,794 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 16:29:03,794 INFO: Repository has been cloned
+2021-11-13 16:29:04,795 INFO: Subscore Complete - Rampup
+2021-11-13 16:29:05,075 INFO: Source pull confirmed
+2021-11-13 16:29:14,166 INFO: Pulls initiative completed
+2021-11-13 16:29:14,167 INFO: Stars initiative completed
+2021-11-13 16:29:14,167 INFO: Subscore Complete - Correctness
+2021-11-13 16:29:14,167 INFO: Contributors aquired
+2021-11-13 16:29:14,834 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 16:29:14,834 INFO: Subscore Complete - Busfactor
+2021-11-13 16:29:15,163 INFO: Data aquired **Issues and Last Commit
+2021-11-13 16:29:24,372 INFO: Issue sub-subscore acheived
+2021-11-13 16:29:24,373 INFO: Commit sub-subscore acheived
+2021-11-13 16:29:24,374 INFO: Subscore Complete - Responsiveness
+2021-11-13 16:29:24,569 INFO: Subscore Complete - License
+2021-11-13 16:29:24,634 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 16:29:24,634 INFO: All repo scores calculated
+2021-11-13 16:29:24,634 INFO: Sorting repos...
+2021-11-13 16:29:24,634 INFO: Sorted repos
+2021-11-13 16:30:11,449 INFO: logger created
+2021-11-13 16:30:11,450 INFO: Modules intialized
+2021-11-13 16:30:11,451 INFO: URLs retrieved
+2021-11-13 16:30:11,451 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 16:30:11,451 INFO: Repository has been cloned
+2021-11-13 16:30:12,281 INFO: Subscore Complete - Rampup
+2021-11-13 16:30:12,536 INFO: Source pull confirmed
+2021-11-13 16:30:21,643 INFO: Pulls initiative completed
+2021-11-13 16:30:21,643 INFO: Stars initiative completed
+2021-11-13 16:30:21,643 INFO: Subscore Complete - Correctness
+2021-11-13 16:30:21,643 INFO: Contributors aquired
+2021-11-13 16:30:22,252 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 16:30:22,252 INFO: Subscore Complete - Busfactor
+2021-11-13 16:30:22,597 INFO: Data aquired **Issues and Last Commit
+2021-11-13 16:30:31,820 INFO: Issue sub-subscore acheived
+2021-11-13 16:30:31,820 INFO: Commit sub-subscore acheived
+2021-11-13 16:30:31,820 INFO: Subscore Complete - Responsiveness
+2021-11-13 16:30:32,008 INFO: Subscore Complete - License
+2021-11-13 16:30:32,172 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 16:30:32,172 INFO: All repo scores calculated
+2021-11-13 16:30:32,172 INFO: Sorting repos...
+2021-11-13 16:30:32,172 INFO: Sorted repos
