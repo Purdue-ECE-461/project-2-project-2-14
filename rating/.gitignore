@@ -1,0 +1,10 @@
+*.pyc
+build/
+dist/
+.env
+__pycache__
+.pytest_cache
+*.log
+.vscode
+temp/
+.coverage
