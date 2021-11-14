@@ -23,7 +23,7 @@ class ScoreDependencies(Score):
         # //print(dependencies) 
         num = self.processDependencies(dependencies)
         # //print(num)
-        self.score = round(float(1/num),2)
+        self.score = float(num/len(dependencies))
         
 
 
