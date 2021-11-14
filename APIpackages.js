@@ -2,10 +2,11 @@
 // TODO: delete temp
 // TODO: delete make new file
 
-const fs = require('fs');
-const exec = require("child_process").execSync;
+
 
 async function rate(moduleURL){
+    const fs = require('fs');
+    const exec = require("child_process").execSync;
     exec('touch ./rating/url.txt');
     exec(`echo ${moduleURL} >> ./rating/url.txt`);
     exec('rating/venv/bin/python rating/main.py rating/url.txt >> rating/result.txt');
@@ -13,13 +14,23 @@ async function rate(moduleURL){
     exec('rm rating/url.txt')
     exec('rm rating/result.txt')
     content = content.split(" ")
-    console.log(content);
     content[6] = content[6].slice(0, -1)
     
     return content
+};
 
-}
+module.exports = rate
+
+/* *******************************************
+                HOW TO USE:
+const rate = require("./APIpackages");
+let ans = rate("https://github.com/alfateam/a")
+console.log(ans);
+console.log(typeof ans);
+******************************************* */
 
 
-data = rate("https://github.com/alfateam/a")
-console.log(data);
+// data = rate("https://github.com/alfateam/a")
+// console.log(data);
+
+
