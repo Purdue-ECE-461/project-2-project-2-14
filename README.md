@@ -1,4 +1,4 @@
-# project-2-project-2-14
-project-2-project-2-14 created by GitHub Classroom
+# Trustworthy Module Registry
+created by Sidd Mitra, Devansh Rathi, Charles Gao
 
 
