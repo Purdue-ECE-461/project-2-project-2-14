@@ -19,7 +19,22 @@ async function rate(moduleURL){
     return content
 };
 
-module.exports = rate
+async function checkIngestibility(scoreArray){
+    for(let i = 0; i < 7; i++){
+        if(scoreArray[i] < 0.5) return false
+    }
+    return true
+}
+
+async function cloneRepo(repoURL){
+    const exec = require("child_process").execSync;
+    exec(`mkdir repo`)
+    exec(`cd repo`)
+    exec(`git clone ${repoURL}`)
+    exec(`rm -rf .git*`)
+}
+
+module.exports = {rate, checkIngestibility, cloneRepo}
 
 /* *******************************************
                 HOW TO USE:
