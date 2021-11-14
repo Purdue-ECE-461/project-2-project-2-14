@@ -64,3 +64,407 @@
 2021-11-13 16:30:32,172 INFO: All repo scores calculated
 2021-11-13 16:30:32,172 INFO: Sorting repos...
 2021-11-13 16:30:32,172 INFO: Sorted repos
+2021-11-13 18:05:47,592 INFO: logger created
+2021-11-13 18:05:47,594 INFO: Modules intialized
+2021-11-13 18:05:47,594 INFO: URLs retrieved
+2021-11-13 18:05:47,595 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 18:05:47,595 INFO: Repository has been cloned
+2021-11-13 18:05:48,647 INFO: Subscore Complete - Rampup
+2021-11-13 18:05:48,945 INFO: Source pull confirmed
+2021-11-13 18:05:57,565 INFO: Pulls initiative completed
+2021-11-13 18:05:57,565 INFO: Stars initiative completed
+2021-11-13 18:05:57,565 INFO: Subscore Complete - Correctness
+2021-11-13 18:05:57,565 INFO: Contributors aquired
+2021-11-13 18:05:58,185 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 18:05:58,186 INFO: Subscore Complete - Busfactor
+2021-11-13 18:05:58,460 INFO: Data aquired **Issues and Last Commit
+2021-11-13 18:06:09,318 INFO: Issue sub-subscore acheived
+2021-11-13 18:06:09,319 INFO: Commit sub-subscore acheived
+2021-11-13 18:06:09,319 INFO: Subscore Complete - Responsiveness
+2021-11-13 18:06:09,529 INFO: Subscore Complete - License
+2021-11-13 18:06:09,707 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 18:06:09,707 INFO: All repo scores calculated
+2021-11-13 18:06:09,707 INFO: Sorting repos...
+2021-11-13 18:06:09,707 INFO: Sorted repos
+2021-11-13 18:07:35,924 INFO: logger created
+2021-11-13 18:07:35,925 INFO: Modules intialized
+2021-11-13 18:07:35,925 INFO: URLs retrieved
+2021-11-13 18:07:35,925 ERROR: URL domain not supported ()
+2021-11-13 18:07:35,925 INFO: Calculating scores for 'alfateam/ahttps://github.com/alfateam/a'...
+2021-11-13 18:07:35,925 INFO: Repository has been cloned
+2021-11-13 18:07:53,764 INFO: logger created
+2021-11-13 18:07:53,766 INFO: Modules intialized
+2021-11-13 18:07:53,766 INFO: URLs retrieved
+2021-11-13 18:07:53,767 ERROR: URL domain not supported ()
+2021-11-13 18:07:53,767 INFO: Calculating scores for 'alfateam/ahttps://github.com/alfateam/a'...
+2021-11-13 18:07:53,767 INFO: Repository has been cloned
+2021-11-13 18:07:56,177 INFO: logger created
+2021-11-13 18:07:56,177 INFO: Modules intialized
+2021-11-13 18:07:56,178 INFO: URLs retrieved
+2021-11-13 18:07:56,178 ERROR: URL domain not supported ()
+2021-11-13 18:07:56,178 INFO: Calculating scores for 'alfateam/ahttps://github.com/alfateam/a'...
+2021-11-13 18:07:56,178 INFO: Repository has been cloned
+2021-11-13 18:10:17,853 INFO: logger created
+2021-11-13 18:10:17,855 INFO: Modules intialized
+2021-11-13 18:10:17,856 INFO: URLs retrieved
+2021-11-13 18:10:17,856 ERROR: URL domain not supported ()
+2021-11-13 18:10:17,856 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 18:10:17,856 INFO: Repository has been cloned
+2021-11-13 18:10:18,789 INFO: Subscore Complete - Rampup
+2021-11-13 18:10:19,052 INFO: Source pull confirmed
+2021-11-13 18:10:27,857 INFO: Pulls initiative completed
+2021-11-13 18:10:27,858 INFO: Stars initiative completed
+2021-11-13 18:10:27,858 INFO: Subscore Complete - Correctness
+2021-11-13 18:10:27,858 INFO: Contributors aquired
+2021-11-13 18:10:28,484 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 18:10:28,484 INFO: Subscore Complete - Busfactor
+2021-11-13 18:10:28,777 INFO: Data aquired **Issues and Last Commit
+2021-11-13 18:10:38,092 INFO: Issue sub-subscore acheived
+2021-11-13 18:10:38,093 INFO: Commit sub-subscore acheived
+2021-11-13 18:10:38,094 INFO: Subscore Complete - Responsiveness
+2021-11-13 18:10:38,296 INFO: Subscore Complete - License
+2021-11-13 18:10:38,390 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 18:10:38,390 INFO: All repo scores calculated
+2021-11-13 18:10:38,390 INFO: Sorting repos...
+2021-11-13 18:10:38,391 INFO: Sorted repos
+2021-11-13 18:11:41,574 INFO: logger created
+2021-11-13 18:11:41,575 INFO: Modules intialized
+2021-11-13 18:11:41,576 INFO: URLs retrieved
+2021-11-13 18:11:41,576 ERROR: URL domain not supported ()
+2021-11-13 18:11:41,576 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 18:11:41,577 INFO: Repository has been cloned
+2021-11-13 18:11:42,437 INFO: Subscore Complete - Rampup
+2021-11-13 18:11:42,670 INFO: Source pull confirmed
+2021-11-13 18:11:51,329 INFO: Pulls initiative completed
+2021-11-13 18:11:51,329 INFO: Stars initiative completed
+2021-11-13 18:11:51,330 INFO: Subscore Complete - Correctness
+2021-11-13 18:11:51,330 INFO: Contributors aquired
+2021-11-13 18:11:51,991 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 18:11:51,992 INFO: Subscore Complete - Busfactor
+2021-11-13 18:11:52,279 INFO: Data aquired **Issues and Last Commit
+2021-11-13 18:12:01,561 INFO: Issue sub-subscore acheived
+2021-11-13 18:12:01,561 INFO: Commit sub-subscore acheived
+2021-11-13 18:12:01,562 INFO: Subscore Complete - Responsiveness
+2021-11-13 18:12:01,794 INFO: Subscore Complete - License
+2021-11-13 18:12:01,965 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 18:12:01,965 INFO: All repo scores calculated
+2021-11-13 18:12:01,966 INFO: Sorting repos...
+2021-11-13 18:12:01,966 INFO: Sorted repos
+2021-11-13 18:12:27,160 INFO: logger created
+2021-11-13 18:12:27,162 INFO: Modules intialized
+2021-11-13 18:12:27,162 INFO: URLs retrieved
+2021-11-13 18:12:27,162 ERROR: URL domain not supported ()
+2021-11-13 18:12:27,163 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 18:12:27,163 INFO: Repository has been cloned
+2021-11-13 18:12:28,076 INFO: Subscore Complete - Rampup
+2021-11-13 18:12:28,323 INFO: Source pull confirmed
+2021-11-13 18:12:36,918 INFO: Pulls initiative completed
+2021-11-13 18:12:36,918 INFO: Stars initiative completed
+2021-11-13 18:12:36,918 INFO: Subscore Complete - Correctness
+2021-11-13 18:12:36,918 INFO: Contributors aquired
+2021-11-13 18:12:37,552 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 18:12:37,553 INFO: Subscore Complete - Busfactor
+2021-11-13 18:12:37,831 INFO: Data aquired **Issues and Last Commit
+2021-11-13 18:13:44,928 INFO: logger created
+2021-11-13 18:13:44,930 INFO: Modules intialized
+2021-11-13 18:13:44,930 INFO: URLs retrieved
+2021-11-13 18:13:44,930 ERROR: URL domain not supported ()
+2021-11-13 18:13:44,930 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 18:13:44,931 INFO: Repository has been cloned
+2021-11-13 18:13:45,719 INFO: Subscore Complete - Rampup
+2021-11-13 18:13:46,017 INFO: Source pull confirmed
+2021-11-13 18:13:55,345 INFO: Pulls initiative completed
+2021-11-13 18:13:55,346 INFO: Stars initiative completed
+2021-11-13 18:13:55,346 INFO: Subscore Complete - Correctness
+2021-11-13 18:13:55,346 INFO: Contributors aquired
+2021-11-13 18:13:56,046 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 18:13:56,047 INFO: Subscore Complete - Busfactor
+2021-11-13 18:13:56,350 INFO: Data aquired **Issues and Last Commit
+2021-11-13 18:14:06,345 INFO: Issue sub-subscore acheived
+2021-11-13 18:14:06,346 INFO: Commit sub-subscore acheived
+2021-11-13 18:14:06,346 INFO: Subscore Complete - Responsiveness
+2021-11-13 18:14:06,563 INFO: Subscore Complete - License
+2021-11-13 18:14:06,738 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 18:14:06,738 INFO: All repo scores calculated
+2021-11-13 18:14:06,738 INFO: Sorting repos...
+2021-11-13 18:14:06,738 INFO: Sorted repos
+2021-11-13 18:15:18,824 INFO: logger created
+2021-11-13 18:15:18,826 INFO: Modules intialized
+2021-11-13 18:15:18,826 INFO: URLs retrieved
+2021-11-13 18:15:18,826 ERROR: URL domain not supported ()
+2021-11-13 18:15:18,827 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 18:15:18,827 INFO: Repository has been cloned
+2021-11-13 18:15:19,606 INFO: Subscore Complete - Rampup
+2021-11-13 18:15:19,881 INFO: Source pull confirmed
+2021-11-13 18:15:28,539 INFO: logger created
+2021-11-13 18:15:28,539 INFO: Modules intialized
+2021-11-13 18:15:28,540 INFO: URLs retrieved
+2021-11-13 18:15:28,540 ERROR: URL domain not supported ()
+2021-11-13 18:15:28,540 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 18:15:28,540 INFO: Repository has been cloned
+2021-11-13 18:15:29,313 INFO: Subscore Complete - Rampup
+2021-11-13 18:15:29,569 INFO: Source pull confirmed
+2021-11-13 18:15:38,369 INFO: Pulls initiative completed
+2021-11-13 18:15:38,370 INFO: Stars initiative completed
+2021-11-13 18:15:38,370 INFO: Subscore Complete - Correctness
+2021-11-13 18:15:38,370 INFO: Contributors aquired
+2021-11-13 18:15:38,976 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 18:15:38,976 INFO: Subscore Complete - Busfactor
+2021-11-13 18:15:39,269 INFO: Data aquired **Issues and Last Commit
+2021-11-13 18:15:48,232 INFO: Issue sub-subscore acheived
+2021-11-13 18:15:48,232 INFO: Commit sub-subscore acheived
+2021-11-13 18:15:48,232 INFO: Subscore Complete - Responsiveness
+2021-11-13 18:15:48,423 INFO: Subscore Complete - License
+2021-11-13 18:15:48,499 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 18:15:48,499 INFO: All repo scores calculated
+2021-11-13 18:15:48,499 INFO: Sorting repos...
+2021-11-13 18:15:48,500 INFO: Sorted repos
+2021-11-13 18:22:10,238 INFO: logger created
+2021-11-13 18:22:10,240 INFO: Modules intialized
+2021-11-13 18:22:10,240 INFO: URLs retrieved
+2021-11-13 18:22:10,241 ERROR: URL domain not supported ()
+2021-11-13 18:22:10,241 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 18:22:10,241 INFO: Repository has been cloned
+2021-11-13 18:22:11,026 INFO: Subscore Complete - Rampup
+2021-11-13 18:22:11,262 INFO: Source pull confirmed
+2021-11-13 18:22:20,118 INFO: Pulls initiative completed
+2021-11-13 18:22:20,118 INFO: Stars initiative completed
+2021-11-13 18:22:20,118 INFO: Subscore Complete - Correctness
+2021-11-13 18:22:20,118 INFO: Contributors aquired
+2021-11-13 18:22:20,778 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 18:22:20,778 INFO: Subscore Complete - Busfactor
+2021-11-13 18:22:21,227 INFO: Data aquired **Issues and Last Commit
+2021-11-13 18:22:32,076 INFO: Issue sub-subscore acheived
+2021-11-13 18:22:32,082 INFO: Commit sub-subscore acheived
+2021-11-13 18:22:32,082 INFO: Subscore Complete - Responsiveness
+2021-11-13 18:22:32,283 INFO: Subscore Complete - License
+2021-11-13 18:22:32,451 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 18:22:32,451 INFO: All repo scores calculated
+2021-11-13 18:22:32,452 INFO: Sorting repos...
+2021-11-13 18:22:32,452 INFO: Sorted repos
+2021-11-13 18:22:48,537 INFO: logger created
+2021-11-13 18:22:48,539 INFO: Modules intialized
+2021-11-13 18:22:48,539 INFO: URLs retrieved
+2021-11-13 18:22:48,539 ERROR: URL domain not supported ()
+2021-11-13 18:22:48,539 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 18:22:48,539 INFO: Repository has been cloned
+2021-11-13 18:22:49,361 INFO: Subscore Complete - Rampup
+2021-11-13 18:22:49,608 INFO: Source pull confirmed
+2021-11-13 18:24:12,280 INFO: logger created
+2021-11-13 18:25:03,283 INFO: logger created
+2021-11-13 18:28:54,677 INFO: logger created
+2021-11-13 18:29:12,339 INFO: logger created
+2021-11-13 18:29:12,340 INFO: Modules intialized
+2021-11-13 18:29:12,341 INFO: URLs retrieved
+2021-11-13 18:29:12,341 ERROR: URL domain not supported ()
+2021-11-13 18:29:12,341 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 18:29:12,341 INFO: Repository has been cloned
+2021-11-13 18:29:13,127 INFO: Subscore Complete - Rampup
+2021-11-13 18:29:13,480 INFO: Source pull confirmed
+2021-11-13 18:45:26,652 INFO: logger created
+2021-11-13 18:45:26,653 INFO: Modules intialized
+2021-11-13 18:45:26,654 INFO: URLs retrieved
+2021-11-13 18:45:26,655 ERROR: URL domain not supported ()
+2021-11-13 18:45:26,655 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 18:45:26,655 INFO: Repository has been cloned
+2021-11-13 18:45:27,420 INFO: Subscore Complete - Rampup
+2021-11-13 18:45:27,736 INFO: Source pull confirmed
+2021-11-13 18:45:36,434 INFO: Pulls initiative completed
+2021-11-13 18:45:36,434 INFO: Stars initiative completed
+2021-11-13 18:45:36,434 INFO: Subscore Complete - Correctness
+2021-11-13 18:45:36,435 INFO: Contributors aquired
+2021-11-13 18:45:37,053 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 18:45:37,053 INFO: Subscore Complete - Busfactor
+2021-11-13 18:45:37,460 INFO: Data aquired **Issues and Last Commit
+2021-11-13 18:45:46,360 INFO: Issue sub-subscore acheived
+2021-11-13 18:45:46,361 INFO: Commit sub-subscore acheived
+2021-11-13 18:45:46,361 INFO: Subscore Complete - Responsiveness
+2021-11-13 18:45:46,587 INFO: Subscore Complete - License
+2021-11-13 18:45:46,836 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 18:45:46,836 INFO: All repo scores calculated
+2021-11-13 18:45:46,836 INFO: Sorting repos...
+2021-11-13 18:45:46,836 INFO: Sorted repos
+2021-11-13 18:49:05,084 INFO: logger created
+2021-11-13 18:49:05,085 INFO: Modules intialized
+2021-11-13 18:49:05,086 INFO: URLs retrieved
+2021-11-13 18:49:05,086 ERROR: URL domain not supported ()
+2021-11-13 18:49:05,086 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 18:49:05,086 INFO: Repository has been cloned
+2021-11-13 18:49:05,983 INFO: Subscore Complete - Rampup
+2021-11-13 18:49:06,303 INFO: Source pull confirmed
+2021-11-13 18:49:14,951 INFO: Pulls initiative completed
+2021-11-13 18:49:14,951 INFO: Stars initiative completed
+2021-11-13 18:49:14,951 INFO: Subscore Complete - Correctness
+2021-11-13 18:49:14,951 INFO: Contributors aquired
+2021-11-13 18:49:15,646 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 18:49:15,647 INFO: Subscore Complete - Busfactor
+2021-11-13 18:49:15,971 INFO: Data aquired **Issues and Last Commit
+2021-11-13 18:49:25,607 INFO: Issue sub-subscore acheived
+2021-11-13 18:49:25,608 INFO: Commit sub-subscore acheived
+2021-11-13 18:49:25,609 INFO: Subscore Complete - Responsiveness
+2021-11-13 18:49:25,795 INFO: Subscore Complete - License
+2021-11-13 18:49:25,895 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 18:49:25,895 INFO: All repo scores calculated
+2021-11-13 18:49:25,895 INFO: Sorting repos...
+2021-11-13 18:49:25,895 INFO: Sorted repos
+2021-11-13 18:50:44,698 INFO: logger created
+2021-11-13 18:50:44,700 INFO: Modules intialized
+2021-11-13 18:50:44,700 INFO: URLs retrieved
+2021-11-13 18:50:44,701 ERROR: URL domain not supported ()
+2021-11-13 18:50:44,701 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 18:50:44,701 INFO: Repository has been cloned
+2021-11-13 18:50:45,583 INFO: Subscore Complete - Rampup
+2021-11-13 18:50:45,841 INFO: Source pull confirmed
+2021-11-13 18:50:54,538 INFO: Pulls initiative completed
+2021-11-13 18:50:54,538 INFO: Stars initiative completed
+2021-11-13 18:50:54,543 INFO: Subscore Complete - Correctness
+2021-11-13 18:50:54,543 INFO: Contributors aquired
+2021-11-13 18:50:55,184 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 18:50:55,184 INFO: Subscore Complete - Busfactor
+2021-11-13 18:50:55,462 INFO: Data aquired **Issues and Last Commit
+2021-11-13 18:51:05,575 INFO: Issue sub-subscore acheived
+2021-11-13 18:51:05,575 INFO: Commit sub-subscore acheived
+2021-11-13 18:51:05,575 INFO: Subscore Complete - Responsiveness
+2021-11-13 18:51:05,800 INFO: Subscore Complete - License
+2021-11-13 18:51:05,972 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 18:51:05,973 INFO: All repo scores calculated
+2021-11-13 18:51:05,973 INFO: Sorting repos...
+2021-11-13 18:51:05,973 INFO: Sorted repos
+2021-11-13 18:52:16,565 INFO: logger created
+2021-11-13 18:52:16,567 INFO: Modules intialized
+2021-11-13 18:52:16,568 INFO: URLs retrieved
+2021-11-13 18:52:16,568 ERROR: URL domain not supported ()
+2021-11-13 18:52:16,568 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 18:52:16,568 INFO: Repository has been cloned
+2021-11-13 18:52:17,370 INFO: Subscore Complete - Rampup
+2021-11-13 18:52:17,597 INFO: Source pull confirmed
+2021-11-13 18:52:27,076 INFO: Pulls initiative completed
+2021-11-13 18:52:27,076 INFO: Stars initiative completed
+2021-11-13 18:52:27,076 INFO: Subscore Complete - Correctness
+2021-11-13 18:52:27,076 INFO: Contributors aquired
+2021-11-13 18:52:28,296 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 18:52:28,296 INFO: Subscore Complete - Busfactor
+2021-11-13 18:52:28,661 INFO: Data aquired **Issues and Last Commit
+2021-11-13 18:52:38,051 INFO: Issue sub-subscore acheived
+2021-11-13 18:52:38,051 INFO: Commit sub-subscore acheived
+2021-11-13 18:52:38,052 INFO: Subscore Complete - Responsiveness
+2021-11-13 18:52:38,242 INFO: Subscore Complete - License
+2021-11-13 18:52:38,308 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 18:52:38,308 INFO: All repo scores calculated
+2021-11-13 18:52:38,308 INFO: Sorting repos...
+2021-11-13 18:52:38,308 INFO: Sorted repos
+2021-11-13 18:53:42,032 INFO: logger created
+2021-11-13 18:53:42,034 INFO: Modules intialized
+2021-11-13 18:53:42,034 INFO: URLs retrieved
+2021-11-13 18:53:42,034 ERROR: URL domain not supported ()
+2021-11-13 18:53:42,035 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 18:53:42,035 INFO: Repository has been cloned
+2021-11-13 18:53:42,920 INFO: Subscore Complete - Rampup
+2021-11-13 18:53:43,167 INFO: Source pull confirmed
+2021-11-13 18:53:52,404 INFO: Pulls initiative completed
+2021-11-13 18:53:52,406 INFO: Stars initiative completed
+2021-11-13 18:53:52,406 INFO: Subscore Complete - Correctness
+2021-11-13 18:53:52,406 INFO: Contributors aquired
+2021-11-13 18:53:53,125 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 18:53:53,125 INFO: Subscore Complete - Busfactor
+2021-11-13 18:53:53,454 INFO: Data aquired **Issues and Last Commit
+2021-11-13 18:54:03,814 INFO: Issue sub-subscore acheived
+2021-11-13 18:54:03,814 INFO: Commit sub-subscore acheived
+2021-11-13 18:54:03,814 INFO: Subscore Complete - Responsiveness
+2021-11-13 18:54:04,040 INFO: Subscore Complete - License
+2021-11-13 18:54:04,136 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 18:54:04,136 INFO: All repo scores calculated
+2021-11-13 18:54:04,137 INFO: Sorting repos...
+2021-11-13 18:54:04,137 INFO: Sorted repos
+2021-11-13 18:58:55,974 INFO: logger created
+2021-11-13 18:58:55,975 INFO: Modules intialized
+2021-11-13 18:58:55,976 INFO: URLs retrieved
+2021-11-13 18:58:55,976 ERROR: URL domain not supported ()
+2021-11-13 18:58:55,976 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 18:58:55,976 INFO: Repository has been cloned
+2021-11-13 18:58:56,788 INFO: Subscore Complete - Rampup
+2021-11-13 18:58:57,080 INFO: Source pull confirmed
+2021-11-13 18:59:06,950 INFO: Pulls initiative completed
+2021-11-13 18:59:06,950 INFO: Stars initiative completed
+2021-11-13 18:59:06,950 INFO: Subscore Complete - Correctness
+2021-11-13 18:59:06,950 INFO: Contributors aquired
+2021-11-13 18:59:07,564 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 18:59:07,565 INFO: Subscore Complete - Busfactor
+2021-11-13 18:59:07,944 INFO: Data aquired **Issues and Last Commit
+2021-11-13 18:59:17,683 INFO: Issue sub-subscore acheived
+2021-11-13 18:59:17,683 INFO: Commit sub-subscore acheived
+2021-11-13 18:59:17,684 INFO: Subscore Complete - Responsiveness
+2021-11-13 18:59:17,880 INFO: Subscore Complete - License
+2021-11-13 18:59:18,050 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 18:59:18,050 INFO: All repo scores calculated
+2021-11-13 18:59:18,050 INFO: Sorting repos...
+2021-11-13 18:59:18,050 INFO: Sorted repos
+2021-11-13 19:09:28,876 INFO: logger created
+2021-11-13 19:09:28,878 INFO: Modules intialized
+2021-11-13 19:09:28,879 INFO: URLs retrieved
+2021-11-13 19:09:28,879 ERROR: URL domain not supported ()
+2021-11-13 19:09:28,879 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 19:09:28,879 INFO: Repository has been cloned
+2021-11-13 19:09:29,720 INFO: Subscore Complete - Rampup
+2021-11-13 19:09:29,995 INFO: Source pull confirmed
+2021-11-13 19:09:38,609 INFO: Pulls initiative completed
+2021-11-13 19:09:38,609 INFO: Stars initiative completed
+2021-11-13 19:09:38,609 INFO: Subscore Complete - Correctness
+2021-11-13 19:09:38,609 INFO: Contributors aquired
+2021-11-13 19:09:39,267 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 19:09:39,268 INFO: Subscore Complete - Busfactor
+2021-11-13 19:09:39,572 INFO: Data aquired **Issues and Last Commit
+2021-11-13 19:09:48,506 INFO: Issue sub-subscore acheived
+2021-11-13 19:09:48,507 INFO: Commit sub-subscore acheived
+2021-11-13 19:09:48,507 INFO: Subscore Complete - Responsiveness
+2021-11-13 19:09:48,699 INFO: Subscore Complete - License
+2021-11-13 19:09:48,912 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 19:09:48,913 INFO: All repo scores calculated
+2021-11-13 19:09:48,913 INFO: Sorting repos...
+2021-11-13 19:09:48,913 INFO: Sorted repos
+2021-11-13 19:32:42,466 INFO: logger created
+2021-11-13 19:32:42,467 INFO: Modules intialized
+2021-11-13 19:32:42,468 INFO: URLs retrieved
+2021-11-13 19:32:42,468 ERROR: URL domain not supported ()
+2021-11-13 19:32:42,468 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 19:32:42,468 INFO: Repository has been cloned
+2021-11-13 19:32:43,443 INFO: Subscore Complete - Rampup
+2021-11-13 19:32:43,675 INFO: Source pull confirmed
+2021-11-13 19:32:52,351 INFO: Pulls initiative completed
+2021-11-13 19:32:52,352 INFO: Stars initiative completed
+2021-11-13 19:32:52,352 INFO: Subscore Complete - Correctness
+2021-11-13 19:32:52,352 INFO: Contributors aquired
+2021-11-13 19:32:52,951 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 19:32:52,951 INFO: Subscore Complete - Busfactor
+2021-11-13 19:32:53,258 INFO: Data aquired **Issues and Last Commit
+2021-11-13 19:33:02,676 INFO: Issue sub-subscore acheived
+2021-11-13 19:33:02,676 INFO: Commit sub-subscore acheived
+2021-11-13 19:33:02,676 INFO: Subscore Complete - Responsiveness
+2021-11-13 19:33:02,912 INFO: Subscore Complete - License
+2021-11-13 19:33:03,078 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 19:33:03,079 INFO: All repo scores calculated
+2021-11-13 19:33:03,079 INFO: Sorting repos...
+2021-11-13 19:33:03,079 INFO: Sorted repos
+2021-11-13 19:33:18,645 INFO: logger created
+2021-11-13 19:33:18,646 INFO: Modules intialized
+2021-11-13 19:33:18,646 INFO: URLs retrieved
+2021-11-13 19:33:18,646 ERROR: URL domain not supported ()
+2021-11-13 19:33:18,646 INFO: Calculating scores for 'alfateam/a'...
+2021-11-13 19:33:18,646 INFO: Repository has been cloned
+2021-11-13 19:33:19,345 INFO: Subscore Complete - Rampup
+2021-11-13 19:33:19,585 INFO: Source pull confirmed
+2021-11-13 19:33:28,195 INFO: Pulls initiative completed
+2021-11-13 19:33:28,195 INFO: Stars initiative completed
+2021-11-13 19:33:28,195 INFO: Subscore Complete - Correctness
+2021-11-13 19:33:28,195 INFO: Contributors aquired
+2021-11-13 19:33:28,800 INFO: Score cache aquired, with contributions and relative frequencies
+2021-11-13 19:33:28,800 INFO: Subscore Complete - Busfactor
+2021-11-13 19:33:29,128 INFO: Data aquired **Issues and Last Commit
+2021-11-13 19:33:38,010 INFO: Issue sub-subscore acheived
+2021-11-13 19:33:38,010 INFO: Commit sub-subscore acheived
+2021-11-13 19:33:38,010 INFO: Subscore Complete - Responsiveness
+2021-11-13 19:33:38,210 INFO: Subscore Complete - License
+2021-11-13 19:33:38,287 INFO: Scores calculated for repo 'alfateam/a'
+2021-11-13 19:33:38,287 INFO: All repo scores calculated
+2021-11-13 19:33:38,288 INFO: Sorting repos...
+2021-11-13 19:33:38,288 INFO: Sorted repos
