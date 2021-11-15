@@ -1,0 +1,19 @@
+name: Deploy to GAE
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+    workflow_dispatch:
+
+jobs:
+    build:
+        name: GAE Deploy
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: google-github-actions/deploy-appengine@main
+              with:
+                  credentials: ${{ secrets.GCP_CREDENTIALS }}
