@@ -25,7 +25,7 @@ async function authenticate(req, res) {
         db.removeAuth(userData.authToken);
     }
 
-    const token = helper.generateKey();
+    const token = helper.generateKey(config.TOKEN_BYTES);
     userData.authToken = token;
     db.updateUser(user.name, userData);
 

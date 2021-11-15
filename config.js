@@ -6,4 +6,5 @@ module.exports = {
     AUTH_KEY: "auth",
     TOKEN_BYTES: 16,
     DELETE_COLLECTION_BATCH: 50,
+    PACKAGE_ID_BYTES: 4,
 };

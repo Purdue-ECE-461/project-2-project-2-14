@@ -7,8 +7,8 @@ function generateHash(string) {
     return crypto.createHash("md5").update(string).digest("hex");
 }
 
-function generateKey() {
-    return crypto.randomBytes(TOKEN_BYTES).toString("hex");
+function generateKey(len) {
+    return crypto.randomBytes(len).toString("hex");
 }
 
 async function __waitFor(ms) {

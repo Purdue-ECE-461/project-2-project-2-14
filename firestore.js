@@ -1,6 +1,6 @@
 const config = require("./config");
-// const Firestore = require("@google-cloud/firestore");
 const path = require("path");
+const { generateKey } = require("./helper");
 
 const USERCOLL = config.USER_KEY;
 const PACKAGECOLL = config.PACKAGE_KEY;
@@ -19,7 +19,6 @@ class FirestoreClient {
             storageBucket: config.BUCKET_NAME,
         });
         this.firestore = this.admin.firestore();
-        // this.storage = ;
         this.bucket = this.admin.storage().bucket();
     }
 
@@ -30,7 +29,6 @@ class FirestoreClient {
                 destination: destination,
                 public: isPublic,
                 metadata: {
-                    // contentType: fileMime,
                     cacheControl: "public, max-age=300",
                 },
             },
@@ -39,9 +37,6 @@ class FirestoreClient {
                     console.log(err);
                     return;
                 }
-                console.log(
-                    `http://storage.googleapis.com/${config.BUCKET_NAME}/${destination}`
-                );
             }
         );
     }
@@ -152,12 +147,21 @@ class Database {
         await this.fs.remove(`${AUTHCOLL}/${token}`);
     }
 
-    async uploadPackage(dir, zipname) {
+    async uploadPackage(dir, zipname, name, version) {
+        const packageID = name + "-" + generateKey(config.PACKAGE_ID_BYTES);
         await this.fs.uploadFile(
             `${dir}/${zipname}`,
-            `${config.PACKAGE_KEY}/${zipname}`,
-            true
+            `${config.PACKAGE_KEY}/${packageID}`,
+            false
         );
+
+        const metadata = {
+            id: packageID,
+            name: name,
+            version: version,
+        };
+
+        await this.fs.save(`${PACKAGECOLL}/${packageID}`, metadata);
     }
 }
 

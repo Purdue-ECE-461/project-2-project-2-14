@@ -24,7 +24,7 @@ async function init() {
 
     console.log("INIT DONE");
 
-    // await db.uploadPackage(".", "trialImage.png");
+    await db.uploadPackage(".", "express-master.zip", "express", "2.3.4");
 }
 
 module.exports = init;
