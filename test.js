@@ -45,7 +45,10 @@ async function start(){
     ans[1] = 0.6
     ans[5] = 0.6
     ////
-    if (await checkIngestibility(ans)) await cloneRepo("https://github.com/alfateam/a");
+    if (await checkIngestibility(ans)){
+        let repo = await cloneRepo("https://github.com/alfateam/a");
+        console.log(repo);    
+    }
 }
 
 start();

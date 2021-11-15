@@ -28,10 +28,14 @@ async function checkIngestibility(scoreArray){
 
 async function cloneRepo(repoURL){
     const exec = require("child_process").execSync;
-    exec(`mkdir repo`)
-    exec(`cd repo`)
-    exec(`git clone ${repoURL}`)
-    exec(`rm -rf .git*`)
+    // exec(`mkdir repo`)
+    // exec(`cd repo`)
+    exec(`git clone ${repoURL} >> ./sidd.txt`)
+    let repo = repoURL.split("/")
+    repo = repo[repo.length -1]
+
+    // exec(`rm -rf .git*`)
+    return repo
 }
 
 module.exports = {rate, checkIngestibility, cloneRepo}
