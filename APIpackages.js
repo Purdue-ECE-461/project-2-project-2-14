@@ -1,9 +1,3 @@
-// TODO: make a func takes in url 
-// TODO: delete temp
-// TODO: delete make new file
-
-
-
 async function rate(moduleURL){
     const fs = require('fs');
     const exec = require("child_process").execSync;
@@ -17,39 +11,29 @@ async function rate(moduleURL){
     content[6] = content[6].slice(0, -1)
     
     return content
-};
+}// rates the module and returns the result as an array of 7 values
 
 async function checkIngestibility(scoreArray){
     for(let i = 0; i < 7; i++){
         if(scoreArray[i] < 0.5) return false
     }
     return true
-}
+}// check if ingestion criteria is met
 
 async function cloneRepo(repoURL){
     const exec = require("child_process").execSync;
-    // exec(`mkdir repo`)
-    // exec(`cd repo`)
-    exec(`git clone ${repoURL} >> ./sidd.txt`)
+    exec(`git clone ${repoURL} >> ./sidd.txt`) // git clone git@github.com:whatever .
     let repo = repoURL.split("/")
     repo = repo[repo.length -1]
-
-    // exec(`rm -rf .git*`)
-    return repo
-}
+    exec(`rm -rf ./${repo}/.git*`)
+    return "./" + repo
+} //clones the repo from the URL into the main folder(proj2-...) and deletes the .git files and return address to the repo folder
 
 module.exports = {rate, checkIngestibility, cloneRepo}
 
 /* *******************************************
                 HOW TO USE:
-const rate = require("./APIpackages");
-let ans = rate("https://github.com/alfateam/a")
-console.log(ans);
-console.log(typeof ans);
+----------------see test.js-------------------
 ******************************************* */
-
-
-// data = rate("https://github.com/alfateam/a")
-// console.log(data);
 
 
