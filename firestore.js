@@ -1,5 +1,5 @@
 const config = require("./config");
-const Firestore = require("@google-cloud/firestore");
+// const Firestore = require("@google-cloud/firestore");
 const path = require("path");
 
 const USERCOLL = config.USER_KEY;
@@ -11,13 +11,39 @@ const DELETE_COLLECTION_BATCH = config.DELETE_COLLECTION_BATCH;
 
 class FirestoreClient {
     constructor() {
-        this.firestore = new Firestore({
-            projectId: "ece461project2-331506",
-            keyFilename: path.join(
-                __dirname,
-                "ece461project2-331506-8fb56b9423ea.json"
-            ),
+        this.admin = require("firebase-admin");
+
+        var serviceAccount = require("./ece461project2-adminkey.json");
+        this.admin.initializeApp({
+            credential: this.admin.credential.cert(serviceAccount),
+            storageBucket: config.BUCKET_NAME,
         });
+        this.firestore = this.admin.firestore();
+        // this.storage = ;
+        this.bucket = this.admin.storage().bucket();
+    }
+
+    async uploadFile(filepath, destination, isPublic) {
+        this.bucket.upload(
+            filepath,
+            {
+                destination: destination,
+                public: isPublic,
+                metadata: {
+                    // contentType: fileMime,
+                    cacheControl: "public, max-age=300",
+                },
+            },
+            function (err, file) {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                console.log(
+                    `http://storage.googleapis.com/${config.BUCKET_NAME}/${destination}`
+                );
+            }
+        );
     }
 
     async save(path, data) {
@@ -124,6 +150,14 @@ class Database {
 
     async removeAuth(token) {
         await this.fs.remove(`${AUTHCOLL}/${token}`);
+    }
+
+    async uploadPackage(dir, zipname) {
+        await this.fs.uploadFile(
+            `${dir}/${zipname}`,
+            `${config.PACKAGE_KEY}/${zipname}`,
+            true
+        );
     }
 }
 
