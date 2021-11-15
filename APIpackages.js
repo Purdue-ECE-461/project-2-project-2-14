@@ -26,7 +26,11 @@ async function cloneRepo(repoURL){
     let repo = repoURL.split("/")
     repo = repo[repo.length -1]
     exec(`rm -rf ./${repo}/.git*`)
-    return "./" + repo
+    exec(`mkdir tmp`)
+    const distAddr = "./tmp/repo.zip"
+    exec(`zip -r ${distAddr} ./${repo}`)
+    exec(`rm -rf ./${repo}`)
+    return distAddr
 } //clones the repo from the URL into the main folder(proj2-...) and deletes the .git files and return address to the repo folder
 
 module.exports = {rate, checkIngestibility, cloneRepo}
