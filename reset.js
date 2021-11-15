@@ -18,11 +18,13 @@ async function empty() {
 async function init() {
     await empty();
 
-    await helper.__waitFor(5000);
+    await helper.__waitFor(3000);
 
     await db.saveUser("admin", helper.generateHash("ece461"), true);
 
     console.log("INIT DONE");
+
+    // await db.uploadPackage(".", "trialImage.png");
 }
 
 module.exports = init;
