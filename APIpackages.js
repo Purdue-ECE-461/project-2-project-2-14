@@ -3,9 +3,8 @@ async function rate(moduleURL) {
     const exec = require("child_process").execSync;
     exec("touch ./rating/url.txt");
     exec(`echo ${moduleURL} >> ./rating/url.txt`);
-    exec(
-        "rating/venv/bin/python rating/main.py rating/url.txt >> rating/result.txt"
-    );
+    exec("python3 rating/main.py rating/url.txt >> rating/result.txt");
+
     var content = fs.readFileSync("rating/result.txt", "utf8");
     exec("rm rating/url.txt");
     exec("rm rating/result.txt");
@@ -24,15 +23,15 @@ async function checkIngestibility(scoreArray) {
 
 async function cloneRepo(repoURL) {
     const exec = require("child_process").execSync;
-    exec(`git clone ${repoURL} >> ./sidd.txt`) // git clone git@github.com:whatever .
-    let repo = repoURL.split("/")
-    repo = repo[repo.length -1]
-    exec(`rm -rf ./${repo}/.git*`)
-    exec(`mkdir tmp`)
-    const distAddr = "./tmp/repo.zip"
-    exec(`zip -r ${distAddr} ./${repo}`)
-    exec(`rm -rf ./${repo}`)
-    return distAddr
+    exec(`git clone ${repoURL} >> ./sidd.txt`); // git clone git@github.com:whatever .
+    let repo = repoURL.split("/");
+    repo = repo[repo.length - 1];
+    exec(`rm -rf ./${repo}/.git*`);
+    exec(`mkdir tmp`);
+    const distAddr = "./tmp/repo.zip";
+    exec(`zip -r ${distAddr} ./${repo}`);
+    exec(`rm -rf ./${repo}`);
+    return distAddr;
 } //clones the repo from the URL into the main folder(proj2-...) and deletes the .git files and return address to the repo folder
 
 module.exports = { rate, checkIngestibility, cloneRepo };
