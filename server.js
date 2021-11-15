@@ -13,7 +13,7 @@ app.use(express.json({ limit: "1mb" }));
 app.use(express.static("public"));
 
 app.get("/", function (req, res) {
-    res.send("<h1>ECE416 Project 2 Team 14 GCLOUD PUSH</h1>");
+    res.send("<h1>ECE416 Project 2 Team 14 CD working</h1>");
 });
 
 const USER_END = config.USER_KEY;
