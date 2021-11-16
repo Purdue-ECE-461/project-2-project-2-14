@@ -58,7 +58,7 @@ class FirestoreClient {
     async increment(path, field) {
         const docRef = this.firestore.doc(path);
         const updateArg = {};
-        updateArg[field] = Firestore.FieldValue.increment(1);
+        updateArg[field] = this.admin.firestore.FieldValue.increment(1);
         docRef.update(updateArg);
     }
 
@@ -147,21 +147,20 @@ class Database {
         await this.fs.remove(`${AUTHCOLL}/${token}`);
     }
 
-    async uploadPackage(dir, zipname, name, version) {
-        const packageID = name + "-" + generateKey(config.PACKAGE_ID_BYTES);
+    async uploadPackage(zippath, metadata) {
+        const packageID =
+            metadata.Name + "-" + generateKey(config.PACKAGE_ID_BYTES);
         await this.fs.uploadFile(
-            `${dir}/${zipname}`,
+            `${zippath}`,
             `${config.PACKAGE_KEY}/${packageID}`,
             false
         );
 
-        const metadata = {
-            id: packageID,
-            name: name,
-            version: version,
-        };
+        metadata.ID = packageID;
 
         await this.fs.save(`${PACKAGECOLL}/${packageID}`, metadata);
+
+        return metadata;
     }
 }
 

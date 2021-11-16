@@ -7,6 +7,7 @@ const express = require("express");
 const db = require("./firestore");
 
 const APIusers = require("./APIusers");
+const APIpackages = require("./APIpackages");
 
 const app = express();
 app.use(express.json({ limit: "1mb" }));
@@ -36,11 +37,11 @@ const USER_END = config.USER_KEY;
 const PACKAGE_END = config.PACKAGE_KEY;
 const LOG_END = config.LOG_KEY;
 
-app.put(`/${USER_END}/authenticate`, APIusers.authenticate);
+app.put(`/authenticate`, APIusers.authenticate);
 
 app.post(`/${USER_END}/create`, APIusers.createNewUser);
 
-// app.post();
+app.post(`/package`, APIpackages.package);
 
 app.listen(process.env.PORT || 3000, () =>
     console.log(`Server is running on port ${process.env.PORT || 3000}`)

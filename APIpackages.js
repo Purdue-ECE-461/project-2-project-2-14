@@ -1,3 +1,31 @@
+const config = require("./config");
+const checkAuth = require("./checkAuth");
+const helper = require("./helper");
+const db = require("./firestore");
+
+async function package(req, res) {
+    if (!(await checkAuth(req.headers, true))) {
+        res.status(401).send();
+        return;
+    }
+
+    var metadata = req.body.metadata;
+    const packageUrl = req.body.data.URL;
+
+    const zippath = await cloneRepo(packageUrl);
+
+    metadata = await db.uploadPackage(zippath, metadata);
+    deleteTMP();
+
+    res.status(200);
+    res.json(metadata);
+}
+
+async function deleteTMP() {
+    const exec = require("child_process").execSync;
+    exec(`rm -rf ./tmp`);
+}
+
 async function rate(moduleURL) {
     const fs = require("fs");
     const exec = require("child_process").execSync;
@@ -36,7 +64,7 @@ async function cloneRepo(repoURL) {
     return distAddr;
 } //clones the repo from the URL into the main folder(proj2-...) and deletes the .git files and return address to the repo folder
 
-module.exports = { rate, checkIngestibility, cloneRepo };
+module.exports = { rate, checkIngestibility, cloneRepo, package };
 
 /* *******************************************
                 HOW TO USE:
