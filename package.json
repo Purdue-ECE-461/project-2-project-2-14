@@ -23,6 +23,8 @@
         "@google-cloud/firestore": "^4.15.1",
         "express": "^4.17.1",
         "firebase-admin": "^10.0.0",
+        "get-github-default-branch-name": "0.0.4",
+        "https": "^1.0.0",
         "multer": "^1.4.3"
     },
     "devDependencies": {

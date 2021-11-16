@@ -7,4 +7,5 @@ module.exports = {
     TOKEN_BYTES: 16,
     DELETE_COLLECTION_BATCH: 50,
     PACKAGE_ID_BYTES: 4,
+    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
 };

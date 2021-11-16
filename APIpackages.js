@@ -2,6 +2,10 @@ const config = require("./config");
 const checkAuth = require("./checkAuth");
 const helper = require("./helper");
 const db = require("./firestore");
+const spawn = require("child_process").spawn;
+const {
+    getGithubDefaultBranchName,
+} = require("get-github-default-branch-name");
 
 async function package(req, res) {
     if (!(await checkAuth(req.headers, true))) {
@@ -12,18 +16,48 @@ async function package(req, res) {
     var metadata = req.body.metadata;
     const packageUrl = req.body.data.URL;
 
-    const zippath = await cloneRepo(packageUrl);
+    // const canIngest = await checkIngestibility(await rate(packageUrl));
+    // if (!canIngest) {
+    //     res.status(200).send("Could not ingest because bad package");
+    //     return;
+    // }
 
-    metadata = await db.uploadPackage(zippath, metadata);
-    deleteTMP();
+    metadata = await saveRepo(packageUrl, metadata);
+    if (!metadata) {
+        res.status(400).send();
+        return;
+    }
+
+    // const zippath = await cloneRepo(packageUrl);
+
+    // metadata = await db.uploadPackage(zippath, metadata);
+    // deleteTMP();
 
     res.status(200);
     res.json(metadata);
 }
 
-async function deleteTMP() {
-    const exec = require("child_process").execSync;
-    exec(`rm -rf ./tmp`);
+async function saveRepo(url, metadata) {
+    try {
+        var packageInfo = url.split("github.com/")[1];
+    } catch {
+        return null;
+    }
+
+    let [owner, name] = packageInfo.split("/");
+    try {
+        var defaultBranch = await getGithubDefaultBranchName({
+            owner: owner,
+            repo: name,
+        });
+    } catch {
+        return null;
+    }
+
+    const downloadUrl = `${url}/archive/heads/${defaultBranch}.zip`;
+    metadata = db.uploadPackageExternal(downloadUrl, metadata);
+
+    return metadata;
 }
 
 async function rate(moduleURL) {
@@ -31,13 +65,15 @@ async function rate(moduleURL) {
     const exec = require("child_process").execSync;
     exec("touch ./rating/url.txt");
     exec(`echo ${moduleURL} >> ./rating/url.txt`);
+    console.log("rating");
     exec(
-        "rating/env/bin/python3 rating/main.py rating/url.txt >> rating/result.txt"
+        "rating/env/bin/python3.8 rating/main.py rating/url.txt >> rating/result.txt"
     );
 
     var content = fs.readFileSync("rating/result.txt", "utf8");
     exec("rm rating/url.txt");
     exec("rm rating/result.txt");
+    console.log("rated");
     content = content.split(" ");
     content[6] = content[6].slice(0, -1);
 
@@ -51,20 +87,7 @@ async function checkIngestibility(scoreArray) {
     return true;
 } // check if ingestion criteria is met
 
-async function cloneRepo(repoURL) {
-    const exec = require("child_process").execSync;
-    exec(`git clone ${repoURL} >> ./sidd.txt`); // git clone git@github.com:whatever .
-    let repo = repoURL.split("/");
-    repo = repo[repo.length - 1];
-    exec(`rm -rf ./${repo}/.git*`);
-    exec(`mkdir tmp`);
-    const distAddr = "./tmp/repo.zip";
-    exec(`zip -r ${distAddr} ./${repo}`);
-    exec(`rm -rf ./${repo}`);
-    return distAddr;
-} //clones the repo from the URL into the main folder(proj2-...) and deletes the .git files and return address to the repo folder
-
-module.exports = { rate, checkIngestibility, cloneRepo, package };
+module.exports = { rate, saveRepo, package };
 
 /* *******************************************
                 HOW TO USE:
