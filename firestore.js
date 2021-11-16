@@ -1,6 +1,7 @@
 const config = require("./config");
 const path = require("path");
 const { generateKey } = require("./helper");
+const https = require("https");
 
 const USERCOLL = config.USER_KEY;
 const PACKAGECOLL = config.PACKAGE_KEY;
@@ -20,6 +21,10 @@ class FirestoreClient {
         });
         this.firestore = this.admin.firestore();
         this.bucket = this.admin.storage().bucket();
+    }
+
+    async getWriteStream(destination) {
+        return this.bucket.file(destination).createWriteStream();
     }
 
     async uploadFile(filepath, destination, isPublic) {
@@ -58,7 +63,7 @@ class FirestoreClient {
     async increment(path, field) {
         const docRef = this.firestore.doc(path);
         const updateArg = {};
-        updateArg[field] = Firestore.FieldValue.increment(1);
+        updateArg[field] = this.admin.firestore.FieldValue.increment(1);
         docRef.update(updateArg);
     }
 
@@ -147,21 +152,37 @@ class Database {
         await this.fs.remove(`${AUTHCOLL}/${token}`);
     }
 
-    async uploadPackage(dir, zipname, name, version) {
-        const packageID = name + "-" + generateKey(config.PACKAGE_ID_BYTES);
+    async uploadPackage(zippath, metadata) {
+        const packageID =
+            metadata.Name + "-" + generateKey(config.PACKAGE_ID_BYTES);
         await this.fs.uploadFile(
-            `${dir}/${zipname}`,
+            `${zippath}`,
             `${config.PACKAGE_KEY}/${packageID}`,
             false
         );
 
-        const metadata = {
-            id: packageID,
-            name: name,
-            version: version,
-        };
+        metadata.ID = packageID;
 
         await this.fs.save(`${PACKAGECOLL}/${packageID}`, metadata);
+
+        return metadata;
+    }
+
+    async uploadPackageExternal(downloadUrl, metadata) {
+        const packageID =
+            metadata.Name + "-" + generateKey(config.PACKAGE_ID_BYTES);
+        const writeStream = await this.fs.getWriteStream(
+            `${config.PACKAGE_KEY}/${packageID}`
+        );
+
+        const request = https.get(downloadUrl, function (response) {
+            response.pipe(writeStream);
+        });
+
+        metadata.ID = packageID;
+
+        await this.fs.save(`${PACKAGECOLL}/${packageID}`, metadata);
+        return metadata;
     }
 }
 

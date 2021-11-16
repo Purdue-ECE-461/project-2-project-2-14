@@ -23,8 +23,7 @@ async function init() {
     await db.saveUser("admin", helper.generateHash("ece461"), true);
 
     console.log("INIT DONE");
-
-    await db.uploadPackage(".", "express-master.zip", "express", "2.3.4");
+    // await db.uploadPackage(".", "express-master.zip", "express", "2.3.4");
 }
 
 module.exports = init;
