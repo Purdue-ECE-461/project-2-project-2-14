@@ -18,7 +18,7 @@ const spawn = require("child_process").spawn;
 app.get("/", async function (req, res) {
     try {
         const out = await new Promise((resolve, reject) => {
-            const pythonTrial = spawn("rating/env/bin/python3", ["trial.py"]);
+            const pythonTrial = spawn("rating/env/bin/python3.8", ["trial.py"]);
             pythonTrial.stdout.on("data", (data) => {
                 resolve(data);
             });
