@@ -3,7 +3,9 @@ async function rate(moduleURL) {
     const exec = require("child_process").execSync;
     exec("touch ./rating/url.txt");
     exec(`echo ${moduleURL} >> ./rating/url.txt`);
-    exec("python3 rating/main.py rating/url.txt >> rating/result.txt");
+    exec(
+        "rating/env/bin/python3 rating/main.py rating/url.txt >> rating/result.txt"
+    );
 
     var content = fs.readFileSync("rating/result.txt", "utf8");
     exec("rm rating/url.txt");
