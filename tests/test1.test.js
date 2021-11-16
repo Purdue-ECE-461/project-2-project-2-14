@@ -1,6 +1,7 @@
 describe("Trial", () => {
-    test("should be running", () => {
+    test("Jest trial", () => {
         const lol = 5;
-        expect(lol).toEqual(5);
+
+        expect(lol).toBe(5);
     });
 });

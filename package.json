@@ -6,7 +6,7 @@
     "scripts": {
         "test": "jest --",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-        "coverage": "jest --collectCoverage --"
+        "coverage": "npx jest --collectCoverage --"
     },
     "repository": {
         "type": "git",
@@ -27,6 +27,7 @@
     },
     "devDependencies": {
         "eslint": "^8.2.0",
+        "firestore-jest-mock": "^0.17.0",
         "jest": "^27.3.1"
     }
 }
