@@ -20,7 +20,6 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-            
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v2
               with:
@@ -30,6 +29,6 @@ jobs:
             - name: Run ESLint
             - uses: bradennapier/eslint-plus-action@v3.4.2
               #uses: stefanoeb/eslint-action@1.0.2
-              run: eslint . --ext .js,.jsx,.ts,.tsx
+              #run: eslint . --ext .js,.jsx,.ts,.tsx
             - name: Test
               run: npm test
