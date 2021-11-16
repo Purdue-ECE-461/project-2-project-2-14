@@ -40,7 +40,7 @@ app.put(`/${USER_END}/authenticate`, APIusers.authenticate);
 
 app.post(`/${USER_END}/create`, APIusers.createNewUser);
 
-app.post();
+// app.post();
 
 app.listen(process.env.PORT || 3000, () =>
     console.log(`Server is running on port ${process.env.PORT || 3000}`)
