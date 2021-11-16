@@ -2,6 +2,7 @@ from input import Input
 
 
 class InputFile(Input):
-    def getUrls(self, filePath):
-        file = open(filePath, 'r')
-        self.urls = file.read().split('\n')
+    def getUrls(self, url):
+        self.urls = [url]
+        # self.urls = file.read().split('\n')
+

@@ -59,8 +59,9 @@ def main():
         os.system(f'rm -rf __pycache__/')
         os.system(f'rm -rf run')
         Log.info('Clean succesful')
-    elif (os.path.exists(sys.argv[1])):  # mode 3
+    # elif (os.path.exists(sys.argv[1])):  # mode 3
         # initlialize modules
+    else:
         input = InputFile()
         datasource = DatasourceGithub()
         output = OutputStdOut()
@@ -91,8 +92,8 @@ def main():
         #print('URL NET_SCORE RAMP_UP_SCORE CORRECTNESS_SCORE BUS_FACTOR_SCORE RESPONSIVE_MAINTAINER_SCORE LICENSE_SCORE DEPENDENCIES_SCORE')
         for repo in repos:
             output.display(repo)
-    else:
-        invalid = True
+    # else:
+        # invalid = True
 
     if (invalid):
         string = r"""usage: ./run <command>
