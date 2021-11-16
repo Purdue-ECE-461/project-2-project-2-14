@@ -28,11 +28,6 @@ async function package(req, res) {
         return;
     }
 
-    // const zippath = await cloneRepo(packageUrl);
-
-    // metadata = await db.uploadPackage(zippath, metadata);
-    // deleteTMP();
-
     res.status(200);
     res.json(metadata);
 }
@@ -54,7 +49,7 @@ async function saveRepo(url, metadata) {
         return null;
     }
 
-    const downloadUrl = `${url}/archive/heads/${defaultBranch}.zip`;
+    const downloadUrl = `https://codeload.github.com/${owner}/${name}/zip/heads/${defaultBranch}`;
     metadata = db.uploadPackageExternal(downloadUrl, metadata);
 
     return metadata;
