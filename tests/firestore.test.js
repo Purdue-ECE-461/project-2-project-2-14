@@ -1,3 +1,5 @@
+//building upon mock firestore jest examples
+
 const { FakeFirestore } = require('firestore-jest-mock');
 const { mockCollection, mockDoc } = require('firestore-jest-mock/mocks/firestore');
 
