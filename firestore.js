@@ -168,14 +168,37 @@ class Database {
         return metadata;
     }
 
-    async uploadPackageExternal(downloadUrl, metadata) {
+    async uploadPackagePublic(downloadUrl, metadata) {
         const packageID =
             metadata.Name + "-" + generateKey(config.PACKAGE_ID_BYTES);
         const writeStream = await this.fs.getWriteStream(
             `${config.PACKAGE_KEY}/${packageID}`
         );
 
-        const request = https.get(downloadUrl, function (response) {
+        https.get(downloadUrl, function (response) {
+            if (!response || response.statusCode !== 200) {
+                return null;
+            }
+            response.pipe(writeStream);
+        });
+
+        metadata.ID = packageID;
+
+        await this.fs.save(`${PACKAGECOLL}/${packageID}`, metadata);
+        return metadata;
+    }
+
+    async uploadPackageLocal(downloadUrl, metadata) {
+        const packageID =
+            metadata.Name + "-" + generateKey(config.PACKAGE_ID_BYTES);
+        const writeStream = await this.fs.getWriteStream(
+            `${config.PACKAGE_KEY}/${packageID}`
+        );
+
+        https.get(downloadUrl, function (response) {
+            if (!response || response.statusCode !== 200) {
+                return null;
+            }
             response.pipe(writeStream);
         });
 

@@ -8,7 +8,7 @@ const {
 } = require("get-github-default-branch-name");
 
 async function package(req, res) {
-    if (!(await checkAuth(req.headers, true))) {
+    if (!(await checkAuth(req.headers, false))) {
         res.status(401).send();
         return;
     }
@@ -50,7 +50,7 @@ async function saveRepo(url, metadata) {
     }
 
     const downloadUrl = `https://codeload.github.com/${owner}/${name}/zip/heads/${defaultBranch}`;
-    metadata = db.uploadPackageExternal(downloadUrl, metadata);
+    metadata = db.uploadPackagePublic(downloadUrl, metadata);
 
     return metadata;
 }
