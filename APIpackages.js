@@ -14,15 +14,31 @@ async function package(req, res) {
     }
 
     var metadata = req.body.metadata;
-    const packageUrl = req.body.data.URL;
+    const packageUrl = req.body?.data?.URL;
+    const content = req.body?.data?.Content;
 
-    // const canIngest = await checkIngestibility(await rate(packageUrl));
-    // if (!canIngest) {
-    //     res.status(200).send("Could not ingest because bad package");
-    //     return;
-    // }
+    if (!packageUrl && !content) {
+        res.status(400);
+    }
 
-    metadata = await saveRepo(packageUrl, metadata);
+    const contentBuf = Buffer.from(content, "base64"); // Ta-da
+    // console.log(buf);
+
+    metadata.URL = packageUrl;
+    if (packageUrl && !content) {
+        // const canIngest = await checkIngestibility(await rate(packageUrl));
+        // if (!canIngest) {
+        //     res.status(200).send("Could not ingest because bad package");
+        //     return;
+        // }
+
+        metadata = await saveRepo(packageUrl, metadata);
+    }
+
+    if (packageUrl && content) {
+        metadata = await saveZip(contentBuf, metadata);
+    }
+
     if (!metadata) {
         res.status(400).send();
         return;
@@ -30,6 +46,12 @@ async function package(req, res) {
 
     res.status(200);
     res.json(metadata);
+}
+
+async function saveZip(contentBuf, metadata) {
+    metadata = db.uploadPackageLocal(contentBuf, metadata);
+
+    return metadata;
 }
 
 async function saveRepo(url, metadata) {

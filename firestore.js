@@ -175,7 +175,7 @@ class Database {
             `${config.PACKAGE_KEY}/${packageID}`
         );
 
-        https.get(downloadUrl, function (response) {
+        const response = https.get(downloadUrl, function (response) {
             if (!response || response.statusCode !== 200) {
                 return null;
             }
@@ -188,19 +188,15 @@ class Database {
         return metadata;
     }
 
-    async uploadPackageLocal(downloadUrl, metadata) {
+    async uploadPackageLocal(contentBuf, metadata) {
         const packageID =
             metadata.Name + "-" + generateKey(config.PACKAGE_ID_BYTES);
         const writeStream = await this.fs.getWriteStream(
             `${config.PACKAGE_KEY}/${packageID}`
         );
 
-        https.get(downloadUrl, function (response) {
-            if (!response || response.statusCode !== 200) {
-                return null;
-            }
-            response.pipe(writeStream);
-        });
+        writeStream.write(contentBuf);
+        writeStream.end();
 
         metadata.ID = packageID;
 

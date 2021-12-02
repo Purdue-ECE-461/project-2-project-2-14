@@ -1,5 +1,5 @@
 module.exports = {
-    BUCKET_NAME: "ece461project2-331506.appspot.com",
+    BUCKET_NAME: "ece461project2-333702.appspot.com",
     USER_KEY: "users",
     PACKAGE_KEY: "packages",
     LOG_KEY: "logs",

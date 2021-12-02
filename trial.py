@@ -1,2 +1,0 @@
-lol = input()
-print(lol)

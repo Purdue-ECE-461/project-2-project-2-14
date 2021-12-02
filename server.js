@@ -16,21 +16,8 @@ app.use(express.static("public"));
 const spawn = require("child_process").spawn;
 
 app.get("/", async function (req, res) {
-    try {
-        const out = await new Promise((resolve, reject) => {
-            const pythonTrial = spawn("rating/env/bin/python3.8", ["trial.py"]);
-            pythonTrial.stdout.on("data", (data) => {
-                resolve(data);
-            });
-            pythonTrial.stdin.write("help\n");
-            setTimeout(() => {
-                resolve("Did not output anything");
-            }, 5000);
-        });
-        res.send(`<h1>ECE416 Project 2 Team 14 ${out}</h1>`);
-    } catch {
-        res.send(`<h1>Error</h1>`);
-    }
+    let json = { hi: 134, hnqod: 1234 };
+    res.send(JSON.stringify(json, null, "\t"));
 });
 
 const USER_END = config.USER_KEY;
