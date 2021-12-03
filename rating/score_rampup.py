@@ -23,6 +23,7 @@ class ScoreRampUp(Score):
 
         if repo.bare:
             rampup = 0
+            sidd = 1;
             Log.error('Repo does not exist.')
             # make sure repo is not empty.
             raise git.exc.InvalidGitRepositoryError
