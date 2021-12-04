@@ -71,6 +71,11 @@ class FirestoreClient {
         });
     }
 
+    async exists(path) {
+        const doc = await this.firestore.doc(path).get();
+        return doc.exists ? true : false;
+    }
+
     async save(path, data) {
         const docRef = this.firestore.doc(path);
         await docRef.set(data);
@@ -197,39 +202,33 @@ class Database {
     }
 
     async uploadPackagePublic(downloadUrl, metadata) {
-        const packageID =
-            metadata.Name + "-" + generateKey(config.PACKAGE_ID_BYTES);
         const writeStream = await this.fs.getWriteStream(
-            `${config.PACKAGE_KEY}/${packageID}`
+            `${config.PACKAGE_KEY}/${metadata.ID}`
         );
 
         const response = https.get(downloadUrl, function (response) {
             if (!response || response.statusCode !== 200) {
-                return null;
+                return false;
             }
             response.pipe(writeStream);
         });
 
-        metadata.ID = packageID;
-
-        await this.fs.save(`${PACKAGECOLL}/${packageID}`, metadata);
-        return metadata;
+        return true;
     }
 
     async uploadPackageLocal(contentBuf, metadata) {
-        const packageID =
-            metadata.Name + "-" + generateKey(config.PACKAGE_ID_BYTES);
         const writeStream = await this.fs.getWriteStream(
-            `${config.PACKAGE_KEY}/${packageID}`
+            `${config.PACKAGE_KEY}/${metadata.ID}`
         );
 
         writeStream.write(contentBuf);
         writeStream.end();
 
-        metadata.ID = packageID;
+        return true;
+    }
 
-        await this.fs.save(`${PACKAGECOLL}/${packageID}`, metadata);
-        return metadata;
+    async savePackageMetadata(metadata) {
+        await this.fs.save(`${PACKAGECOLL}/${metadata.ID}`, metadata);
     }
 
     async getPackagesMetadata(offset) {
@@ -242,6 +241,15 @@ class Database {
             out.push(p.data());
         });
         return out;
+    }
+
+    async getPackageMetadata(id) {
+        const metadata = await this.fs.get(`${PACKAGECOLL}/${id}`);
+        return metadata.data();
+    }
+
+    async checkPackage(id) {
+        return await this.fs.exists(`${config.PACKAGE_KEY}/${id}`);
     }
 
     async downloadPackage(id) {
