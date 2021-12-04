@@ -2,6 +2,7 @@ const config = require("./config");
 const path = require("path");
 const { generateKey } = require("./helper");
 const https = require("https");
+const { createReadStream } = require("fs");
 
 const USERCOLL = config.USER_KEY;
 const PACKAGECOLL = config.PACKAGE_KEY;
@@ -23,27 +24,51 @@ class FirestoreClient {
         this.bucket = this.admin.storage().bucket();
     }
 
+    async fileExists(path) {
+        return await this.bucket.file(path).exists();
+    }
+
     async getWriteStream(destination) {
         return this.bucket.file(destination).createWriteStream();
     }
 
-    async uploadFile(filepath, destination, isPublic) {
-        this.bucket.upload(
-            filepath,
-            {
-                destination: destination,
-                public: isPublic,
-                metadata: {
-                    cacheControl: "public, max-age=300",
-                },
-            },
-            function (err, file) {
-                if (err) {
-                    console.log(err);
-                    return;
-                }
+    async getReadStream(path) {
+        const [exists] = await this.fileExists(path);
+        if (exists) {
+            return this.bucket.file(path).createReadStream();
+        }
+        return null;
+    }
+
+    async deletePackage(path) {
+        const [exists] = await this.fileExists(path);
+        if (exists) {
+            await this.bucket.file(path).delete();
+            return true;
+        }
+        return false;
+    }
+
+    async emptyBucket() {
+        let files;
+        try {
+            files = await this.bucket.getFiles();
+            console.log();
+            if (files.length === 0) {
+                return;
             }
+            files = files[0];
+        } catch {
+            console.log("error getting files");
+            return;
+        }
+        // console.log(files);
+        const packageFiles = files.filter((f) =>
+            f.metadata.id.includes(`/${config.PACKAGE_KEY}/`)
         );
+        packageFiles.forEach(async (f) => {
+            await f.delete();
+        });
     }
 
     async save(path, data) {
@@ -53,7 +78,17 @@ class FirestoreClient {
 
     async get(path) {
         const docRef = this.firestore.doc(path);
-        return await docRef.get();
+        const doc = await docRef.get();
+        return doc.exists ? doc : null;
+    }
+
+    async getFromCollection(colPath, offset) {
+        const colRef = this.firestore.collection(colPath);
+        return await colRef
+            .orderBy("Name")
+            .limit(config.OFFSET_SIZE)
+            .offset(config.OFFSET_SIZE * offset)
+            .get();
     }
 
     async remove(path) {
@@ -106,6 +141,10 @@ class Database {
         this.fs = new FirestoreClient();
     }
 
+    async deletePackages() {
+        await this.fs.emptyBucket();
+    }
+
     async deleteCollection(collectionPath) {
         this.fs.deleteCollection(collectionPath, DELETE_COLLECTION_BATCH);
     }
@@ -118,6 +157,10 @@ class Database {
             authToken: null,
         };
         this.fs.save(`${USERCOLL}/${name}`, userData);
+    }
+
+    async deleteUser(name) {
+        this.fs.remove(`${USERCOLL}/${name}`);
     }
 
     async updateUser(name, userData) {
@@ -142,30 +185,15 @@ class Database {
 
     async getAuth(token) {
         const auth = await this.fs.get(`${AUTHCOLL}/${token}`);
-        if (auth !== undefined) {
+        if (auth !== null) {
             this.fs.increment(`${AUTHCOLL}/${token}`, "numRequests");
+            return auth.data();
         }
-        return auth.data();
+        return null;
     }
 
     async removeAuth(token) {
         await this.fs.remove(`${AUTHCOLL}/${token}`);
-    }
-
-    async uploadPackage(zippath, metadata) {
-        const packageID =
-            metadata.Name + "-" + generateKey(config.PACKAGE_ID_BYTES);
-        await this.fs.uploadFile(
-            `${zippath}`,
-            `${config.PACKAGE_KEY}/${packageID}`,
-            false
-        );
-
-        metadata.ID = packageID;
-
-        await this.fs.save(`${PACKAGECOLL}/${packageID}`, metadata);
-
-        return metadata;
     }
 
     async uploadPackagePublic(downloadUrl, metadata) {
@@ -202,6 +230,27 @@ class Database {
 
         await this.fs.save(`${PACKAGECOLL}/${packageID}`, metadata);
         return metadata;
+    }
+
+    async getPackagesMetadata(offset) {
+        const packages = await this.fs.getFromCollection(
+            `${config.PACKAGE_KEY}`,
+            offset
+        );
+        const out = [];
+        packages.forEach((p) => {
+            out.push(p.data());
+        });
+        return out;
+    }
+
+    async downloadPackage(id) {
+        return await this.fs.getReadStream(`${config.PACKAGE_KEY}/${id}`);
+    }
+
+    async deletePackage(id) {
+        await this.fs.remove(`${config.PACKAGE_KEY}/${id}`);
+        return await this.fs.deletePackage(`${config.PACKAGE_KEY}/${id}`);
     }
 }
 

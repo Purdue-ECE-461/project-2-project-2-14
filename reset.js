@@ -17,11 +17,15 @@ async function empty() {
 
 async function init() {
     await empty();
+    await db.deletePackages();
 
     await helper.__waitFor(3000);
 
-    await db.saveUser("admin", helper.generateHash("ece461"), true);
-
+    await db.saveUser(
+        config.ADMIN_USERNAME,
+        helper.generateHash("ece461"),
+        true
+    );
     console.log("INIT DONE");
     // await db.uploadPackage(".", "express-master.zip", "express", "2.3.4");
 }

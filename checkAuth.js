@@ -3,13 +3,13 @@ const db = require("./firestore");
 
 async function checkAuth(headers, isAdmin) {
     const token = headers["x-authorization"];
-    if (token === undefined) {
+    if (token === null) {
         return false;
     }
 
     const auth = await db.getAuth(token);
 
-    if (auth === undefined) {
+    if (auth === null) {
         return false;
     }
 

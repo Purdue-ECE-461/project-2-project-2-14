@@ -40,17 +40,42 @@ async function createNewUser(req, res) {
         return;
     }
 
-    const username = req.body.username;
-    const password = req.body.password;
-    const isAdmin = req.body.isAdmin;
+    const username = req.body?.username;
+    const password = req.body?.password;
+    const isAdmin = req.body?.isAdmin;
 
     if (!username || !password || isAdmin === undefined) {
         res.status(400).send("Incorrect inputs");
         return;
     }
 
+    if (username === config.ADMIN_USERNAME) {
+        res.status(400).send("Cannot use the username provided");
+    }
     // TODO: check is username is not taken
     await db.saveUser(username, helper.generateHash(password), isAdmin);
+
+    res.status(200).send();
+}
+
+async function deleteUser(req, res) {
+    if (!(await checkAuth(req.headers, true))) {
+        res.status(401).send();
+        return;
+    }
+
+    const username = req.body?.username;
+
+    if (!username) {
+        res.status(400).send("Incorrect inputs");
+        return;
+    }
+
+    if (username === config.ADMIN_USERNAME) {
+        res.status(400).send("Cannot delete the username");
+    }
+
+    await db.deleteUser(username);
 
     res.status(200).send();
 }
@@ -58,4 +83,5 @@ async function createNewUser(req, res) {
 module.exports = {
     authenticate,
     createNewUser,
+    deleteUser,
 };

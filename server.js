@@ -1,8 +1,8 @@
 const config = require("./config");
-
 const reset = require("./reset");
 reset();
 
+const checkAuth = require("./checkAuth");
 const express = require("express");
 const db = require("./firestore");
 
@@ -26,9 +26,26 @@ const LOG_END = config.LOG_KEY;
 
 app.put(`/authenticate`, APIusers.authenticate);
 
-app.post(`/${USER_END}/create`, APIusers.createNewUser);
+app.post(`/user`, APIusers.createNewUser);
 
-app.post(`/package`, APIpackages.package);
+app.delete(`/user`, APIusers.deleteUser);
+
+app.post(`/package`, APIpackages.addPackage);
+
+app.get("/package/:id", APIpackages.getPackage);
+
+app.delete("/package/:id", APIpackages.deletePackage);
+
+app.get("/packages", APIpackages.getPackages);
+
+app.delete("/reset", (req, res) => {
+    // if (!(await checkAuth(req.headers, true))) {
+    //     res.status(401).send();
+    //     return;
+    // }
+    reset();
+    res.status(200).send();
+});
 
 app.listen(process.env.PORT || 3000, () =>
     console.log(`Server is running on port ${process.env.PORT || 3000}`)

@@ -1,13 +1,66 @@
 const config = require("./config");
-const checkAuth = require("./checkAuth");
 const helper = require("./helper");
 const db = require("./firestore");
+const checkAuth = require("./checkAuth");
 const spawn = require("child_process").spawn;
 const {
     getGithubDefaultBranchName,
 } = require("get-github-default-branch-name");
 
-async function package(req, res) {
+async function getPackages(req, res) {
+    if (!(await checkAuth(req.headers, false))) {
+        res.status(401).send();
+        return;
+    }
+
+    let offset = req.query?.offset;
+    if (offset === undefined) {
+        offset = 0;
+    }
+
+    const packages = await db.getPackagesMetadata(offset);
+    // console.log(packages);
+    res.status(200).json(packages);
+}
+
+async function deletePackage(req, res) {
+    if (!(await checkAuth(req.headers, false))) {
+        res.status(401).send();
+        return;
+    }
+
+    const id = req.params.id;
+    const deleted = await db.deletePackage(id);
+
+    if (!deleted) {
+        res.status(404).send("Package not found");
+        return;
+    }
+    res.status(200).send();
+}
+
+async function getPackage(req, res) {
+    //TODO: GET metadata
+    if (!(await checkAuth(req.headers, false))) {
+        res.status(401).send();
+        return;
+    }
+
+    const id = req.params.id;
+    const readStream = await db.downloadPackage(id);
+
+    if (readStream === null) {
+        res.status(404).send("Package not found");
+        return;
+    }
+
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader("Content-Disposition", "attachment; filename=" + id + ".zip");
+    res.status(200);
+    readStream.pipe(res);
+}
+
+async function addPackage(req, res) {
     if (!(await checkAuth(req.headers, false))) {
         res.status(401).send();
         return;
@@ -21,11 +74,9 @@ async function package(req, res) {
         res.status(400);
     }
 
-    const contentBuf = Buffer.from(content, "base64"); // Ta-da
-    // console.log(buf);
-
     metadata.URL = packageUrl;
     if (packageUrl && !content) {
+        //TODO: get github link out of zip
         // const canIngest = await checkIngestibility(await rate(packageUrl));
         // if (!canIngest) {
         //     res.status(200).send("Could not ingest because bad package");
@@ -36,6 +87,7 @@ async function package(req, res) {
     }
 
     if (packageUrl && content) {
+        const contentBuf = Buffer.from(content, "base64"); // Ta-da
         metadata = await saveZip(contentBuf, metadata);
     }
 
@@ -104,7 +156,14 @@ async function checkIngestibility(scoreArray) {
     return true;
 } // check if ingestion criteria is met
 
-module.exports = { rate, saveRepo, package };
+module.exports = {
+    rate,
+    saveRepo,
+    addPackage,
+    getPackage,
+    deletePackage,
+    getPackages,
+};
 
 /* *******************************************
                 HOW TO USE:
