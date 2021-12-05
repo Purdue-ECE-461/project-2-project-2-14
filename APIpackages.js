@@ -83,9 +83,7 @@ async function rate(moduleURL) {
     exec("touch ./rating/url.txt");
     exec(`echo ${moduleURL} >> ./rating/url.txt`);
     console.log("rating");
-    exec(
-        "rating/env/bin/python3.8 rating/main.py rating/url.txt >> rating/result.txt"
-    );
+    exec("rating/env/bin/python3.8 rating/main.py rating/url.txt >> rating/result.txt");
 
     var content = fs.readFileSync("rating/result.txt", "utf8");
     exec("rm rating/url.txt");
@@ -104,7 +102,38 @@ async function checkIngestibility(scoreArray) {
     return true;
 } // check if ingestion criteria is met
 
-module.exports = { rate, saveRepo, package };
+async function rate2(req, res){
+    let id = req.params.id;
+    const exec = require("child_process").execSync;
+    data = exec(`python3 test.py ${id}`).toString();
+    console.log(data);
+    res.status(200).send(data);
+}
+
+async function rateUserRepo(req, res){
+    let url = `https://github.com/${req.params.user}/${req.params.repo}`
+    console.log(url);
+    const exec = require("child_process").execSync;
+    data = exec(`python3 rating/main.py ${url}`).toString();
+    data = data.split(" ");
+    data[6] = data[6].slice(0, -1);
+    console.log(data);
+    let json = {
+        "RampUp": Number(data[1]),
+        "Correctness": Number(data[2]),
+        "BusFactor": Number(data[3]),
+        "ResponsiveMaintainer": Number(data[4]),
+        "LicenseScore": Number(data[5]),
+        "GoodPinningPractice": Number(data[6])
+    }
+    res.status(200)
+    res.end(JSON.stringify(json, null, 3));
+    // res.status(200).send(data);
+}
+
+module.exports = { rate, saveRepo, package, rate2, rateUserRepo};
+
+
 
 /* *******************************************
                 HOW TO USE:
