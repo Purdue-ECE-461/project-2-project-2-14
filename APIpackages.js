@@ -1,5 +1,5 @@
 const config = require("./config");
-const helper = require("./helper");
+const { decodeVersion, encodeVersion } = require("./helper");
 const db = require("./firestore");
 const checkAuth = require("./checkAuth");
 const spawn = require("child_process").spawn;
@@ -18,8 +18,27 @@ async function getPackages(req, res) {
         offset = 0;
     }
 
-    const packages = await db.getPackagesMetadata(offset);
-    // console.log(packages);
+    res.setHeader("offset", offset);
+
+    const queryArr = req.body;
+    if (!queryArr || queryArr.length === 0) {
+        const packages = await db.getAllPackagesMetadata(offset);
+        // console.log(packages);
+        res.status(200).json(packages);
+        return;
+    }
+
+    // console.log(queryArr);
+
+    // const parsedQueryArr = parseQueryArr(queryArr);
+    for (let i = 0; i < queryArr.length; i++) {
+        if (!queryArr[i].Name || !queryArr[i].Version) {
+            res.status(400).send("Incorrect query array");
+            return;
+        }
+    }
+
+    const packages = await db.searchPackagesMetadata(queryArr, offset);
     res.status(200).json(packages);
 }
 
@@ -79,11 +98,6 @@ async function updatePackage(req, res) {
         return;
     }
 
-    // if (!(await db.checkPackage(id))) {
-    //     res.status(404).send("package not found");
-    //     return;
-    // }
-
     var newMetadata = req.body?.metadata;
     const packageUrl = req.body?.data?.URL;
     const content = req.body?.data?.Content;
@@ -117,6 +131,7 @@ async function updatePackage(req, res) {
     }
 
     res.status(200);
+    metadata.Version = decodeVersion(metadata.Version);
     res.json(metadata);
 }
 
@@ -126,7 +141,7 @@ function checkMetadata(oldData, newData) {
     }
     return (
         oldData.ID === newData.ID &&
-        oldData.Version === newData.Version &&
+        oldData.Version === encodeVersion(newData.Version) &&
         oldData.Name === newData.Name
     );
 }
@@ -140,6 +155,11 @@ async function addPackage(req, res) {
     var metadata = req.body?.metadata;
     const packageUrl = req.body?.data?.URL;
     const content = req.body?.data?.Content;
+
+    if (!metadata.Name || !metadata.Version || !metadata.ID) {
+        res.status(400).send("incorrect metadata provided");
+        return;
+    }
 
     if (metadata === undefined) {
         res.status(400).send("no metadata provided");
@@ -164,10 +184,12 @@ async function addPackage(req, res) {
         res.status(400).send();
         return;
     }
-    db.savePackageMetadata(metadata);
 
     res.status(200);
     res.json(metadata);
+
+    metadata.Version = encodeVersion(metadata.Version);
+    db.savePackageMetadata(metadata);
 }
 
 async function upload(packageUrl, content, metadata) {

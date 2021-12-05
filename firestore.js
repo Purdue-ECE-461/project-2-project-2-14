@@ -1,6 +1,6 @@
 const config = require("./config");
 const path = require("path");
-const { generateKey } = require("./helper");
+const { generateKey, encodeVersion, decodeVersion } = require("./helper");
 const https = require("https");
 const { createReadStream } = require("fs");
 
@@ -53,7 +53,6 @@ class FirestoreClient {
         let files;
         try {
             files = await this.bucket.getFiles();
-            console.log();
             if (files.length === 0) {
                 return;
             }
@@ -87,13 +86,45 @@ class FirestoreClient {
         return doc.exists ? doc : null;
     }
 
-    async getFromCollection(colPath, offset) {
+    async getAllFromCollection(colPath, offset) {
         const colRef = this.firestore.collection(colPath);
         return await colRef
             .orderBy("Name")
             .limit(config.OFFSET_SIZE)
             .offset(config.OFFSET_SIZE * offset)
             .get();
+    }
+
+    async runQuery(colPath, queryArr, pageOffset) {
+        const colRef = this.firestore.collection(colPath);
+        const out = [];
+
+        let index = 0;
+        const offset = pageOffset * config.OFFSET_SIZE;
+
+        for (const conditions of queryArr) {
+            let ref = colRef;
+            conditions.forEach((c) => {
+                ref = ref.where(c.key, c.oper, c.value);
+            });
+
+            const snapshot = await ref.get();
+
+            try {
+                snapshot.forEach((p) => {
+                    if (index < offset) {
+                        index++;
+                        return;
+                    }
+                    if (index >= offset + config.OFFSET_SIZE) {
+                        throw "break";
+                    }
+                    out.push(p.data());
+                    index++;
+                });
+            } catch (e) {}
+        }
+        return out;
     }
 
     async remove(path) {
@@ -231,8 +262,8 @@ class Database {
         await this.fs.save(`${PACKAGECOLL}/${metadata.ID}`, metadata);
     }
 
-    async getPackagesMetadata(offset) {
-        const packages = await this.fs.getFromCollection(
+    async getAllPackagesMetadata(offset) {
+        const packages = await this.fs.getAllFromCollection(
             `${config.PACKAGE_KEY}`,
             offset
         );
@@ -241,6 +272,108 @@ class Database {
             out.push(p.data());
         });
         return out;
+    }
+
+    async searchPackagesMetadata(queryArr, offset) {
+        const fsQueries = this.parseQueries(queryArr);
+
+        const result = await this.fs.runQuery(
+            `${config.PACKAGE_KEY}`,
+            fsQueries,
+            offset
+        );
+
+        const out = [];
+        result.forEach((p) => {
+            p.Version = decodeVersion(p.Version);
+            out.push(p);
+        });
+        return out;
+    }
+
+    parseQueries(queryArr) {
+        const fsQueries = [];
+
+        for (let i = 0; i < queryArr.length; i++) {
+            const q = queryArr[i];
+            const conditions = [];
+            let fsq = {
+                key: "Name",
+                oper: "==",
+                value: q.Name,
+            };
+            conditions.push(fsq);
+
+            if (q.Version) {
+                try {
+                    if (q.Version.includes("-")) {
+                        let versions = q.Version.split("-");
+                        fsq = {
+                            key: "Version",
+                            oper: ">=",
+                            value: encodeVersion(versions[0]),
+                        };
+                        conditions.push(fsq);
+
+                        fsq = {
+                            key: "Version",
+                            oper: "<=",
+                            value: encodeVersion(versions[1]),
+                        };
+                        conditions.push(fsq);
+                    } else if (q.Version.includes("^")) {
+                        let major = parseInt(
+                            q.Version.split("^")[1].split(".")[0]
+                        );
+                        fsq = {
+                            key: "Version",
+                            oper: ">=",
+                            value: encodeVersion(`${major}.0.0`),
+                        };
+                        conditions.push(fsq);
+
+                        fsq = {
+                            key: "Version",
+                            oper: "<",
+                            value: encodeVersion(`${major + 1}.0.0`),
+                        };
+                        conditions.push(fsq);
+                    } else if (q.Version.includes("~")) {
+                        let major = parseInt(
+                            q.Version.split("^")[1].split(".")[0]
+                        );
+                        let minor = parseInt(
+                            q.Version.split("^")[1].split(".")[1]
+                        );
+                        fsq = {
+                            key: "Version",
+                            oper: ">=",
+                            value: encodeVersion(`${major}.${minor}.0`),
+                        };
+                        conditions.push(fsq);
+
+                        fsq = {
+                            key: "Version",
+                            oper: "<",
+                            value: encodeVersion(`${major}.${minor + 1}.0`),
+                        };
+                        conditions.push(fsq);
+                    } else {
+                        fsq = {
+                            key: "Version",
+                            oper: "==",
+                            value: encodeVersion(q.Version),
+                        };
+                        conditions.push(fsq);
+                    }
+                } catch {
+                    return null;
+                }
+            }
+
+            fsQueries.push(conditions);
+        }
+        return fsQueries;
     }
 
     async getPackageMetadata(id) {

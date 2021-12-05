@@ -8,6 +8,6 @@ module.exports = {
     DELETE_COLLECTION_BATCH: 50,
     PACKAGE_ID_BYTES: 4,
     GITHUB_TOKEN: process.env.GITHUB_TOKEN,
-    OFFSET_SIZE: 3,
+    OFFSET_SIZE: 5,
     ADMIN_USERNAME: "admin",
 };
