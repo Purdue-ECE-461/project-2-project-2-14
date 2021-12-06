@@ -23,14 +23,10 @@ async function getPackages(req, res) {
     const queryArr = req.body;
     if (!queryArr || queryArr.length === 0) {
         const packages = await db.getAllPackagesMetadata(offset);
-        // console.log(packages);
         res.status(200).json(packages);
         return;
     }
 
-    // console.log(queryArr);
-
-    // const parsedQueryArr = parseQueryArr(queryArr);
     for (let i = 0; i < queryArr.length; i++) {
         if (!queryArr[i].Name || !queryArr[i].Version) {
             res.status(400).send("Incorrect query array");
@@ -40,6 +36,43 @@ async function getPackages(req, res) {
 
     const packages = await db.searchPackagesMetadata(queryArr, offset);
     res.status(200).json(packages);
+}
+
+async function getHistoryByName(req, res) {
+    if (!(await checkAuth(req.headers, false))) {
+        res.status(401).send();
+        return;
+    }
+
+    const name = req.params?.name;
+    if (name === undefined) {
+        res.status(400).send("name not defined");
+        return;
+    }
+
+    const logs = await db.getHistoryByName(name);
+
+    res.status(200).json(logs);
+}
+
+async function deletePackageByName(req, res) {
+    if (!(await checkAuth(req.headers, false))) {
+        res.status(401).send();
+        return;
+    }
+
+    const name = req.params?.name;
+    if (name === undefined) {
+        res.status(400).send("name not defined");
+        return;
+    }
+
+    const deleted = await db.deletePackageByName(name);
+    if (!deleted) {
+        res.status(400).send("Could not complete request");
+        return;
+    }
+    res.status(200).send();
 }
 
 async function deletePackage(req, res) {
@@ -84,6 +117,10 @@ async function getPackage(req, res) {
     res.setHeader("Content-Disposition", "attachment; filename=" + id + ".zip");
     res.status(200);
     readStream.pipe(res);
+
+    db.getPackageMetadata(id).then((metadata) => {
+        db.saveHistoryLog(req.headers["x-authorization"], metadata, "DOWNLOAD");
+    });
 }
 
 async function updatePackage(req, res) {
@@ -131,6 +168,7 @@ async function updatePackage(req, res) {
     }
 
     res.status(200);
+    db.saveHistoryLog(req.headers["x-authorization"], metadata, "UPDATE");
     metadata.Version = decodeVersion(metadata.Version);
     res.json(metadata);
 }
@@ -156,14 +194,17 @@ async function addPackage(req, res) {
     const packageUrl = req.body?.data?.URL;
     const content = req.body?.data?.Content;
 
+    if (metadata === undefined) {
+        res.status(400).send("no metadata provided");
+        return;
+    }
     if (!metadata.Name || !metadata.Version || !metadata.ID) {
         res.status(400).send("incorrect metadata provided");
         return;
     }
 
-    if (metadata === undefined) {
-        res.status(400).send("no metadata provided");
-        return;
+    if (metadata.isSensitive === undefined) {
+        metadata.isSensitive = false;
     }
 
     if (await db.checkPackage(metadata.ID)) {
@@ -176,40 +217,47 @@ async function addPackage(req, res) {
         return;
     }
 
-    metadata.URL = packageUrl;
+    metadata = await upload(packageUrl, content, metadata);
 
-    let success = upload(packageUrl, content, metadata);
-
-    if (!success) {
+    if (!metadata) {
         res.status(400).send();
         return;
     }
 
-    res.status(200);
-    res.json(metadata);
+    res.status(200).json(metadata);
 
     metadata.Version = encodeVersion(metadata.Version);
     db.savePackageMetadata(metadata);
+
+    db.saveHistoryLog(req.headers["x-authorization"], metadata, "CREATE");
 }
 
 async function upload(packageUrl, content, metadata) {
     let success = false;
-    if (packageUrl && !content) {
-        //TODO: get github link out of zip
+    if (packageUrl) {
         // const canIngest = await checkIngestibility(await rate(packageUrl));
         // if (!canIngest) {
         //     res.status(200).send("Could not ingest because bad package");
         //     return;
         // }
-
+        metadata.URL = packageUrl;
         success = await saveRepo(packageUrl, metadata);
+    } else if (content) {
+        //TODO: get github link out of zip
+        // metadata.URL = githubUrl;
+        const zippedBuf = Buffer.from(content, "base64");
+
+        // if (!(await db.uploadToTemp(unzippedBuf))) {
+        //     return null;
+        // }
+
+        success = await saveZip(zippedBuf, metadata);
     }
 
-    if (packageUrl && content) {
-        const contentBuf = Buffer.from(content, "base64"); // Ta-da
-        success = await saveZip(contentBuf, metadata);
+    if (!success) {
+        return null;
     }
-    return success;
+    return metadata;
 }
 
 async function saveZip(contentBuf, metadata) {
@@ -275,6 +323,8 @@ module.exports = {
     deletePackage,
     getPackages,
     updatePackage,
+    deletePackageByName,
+    getHistoryByName,
 };
 
 /* *******************************************

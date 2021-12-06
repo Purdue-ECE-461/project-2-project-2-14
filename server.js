@@ -18,29 +18,108 @@ app.get(`/`, (req, res) => {
     res.send("<h1>ECE 461 Project 2 Group 14</h1>");
 });
 
-app.put(`/authenticate`, APIusers.authenticate);
+app.put(`/authenticate`, (req, res) => {
+    try {
+        APIusers.authenticate(req, res);
+    } catch (e) {
+        res.status(500).send();
+        console.log(e);
+    }
+});
 
-app.post(`/user`, APIusers.createNewUser);
+app.post(`/user`, (req, res) => {
+    try {
+        APIusers.createNewUser(req, res);
+    } catch (e) {
+        res.status(500).send();
+        console.log(e);
+    }
+});
 
-app.delete(`/user`, APIusers.deleteUser);
+app.delete(`/user`, (req, res) => {
+    try {
+        APIusers.deleteUser(req, res);
+    } catch (e) {
+        res.status(500).send();
+        console.log(e);
+    }
+});
 
-app.post(`/package`, APIpackages.addPackage);
+app.post(`/package`, (req, res) => {
+    try {
+        APIpackages.addPackage(req, res);
+    } catch (e) {
+        res.status(500).send();
+        console.log(e);
+    }
+});
 
-app.get("/package/:id", APIpackages.getPackage);
+app.get("/package/:id", (req, res) => {
+    try {
+        APIpackages.getPackage(req, res);
+    } catch (e) {
+        res.status(500).send();
+        console.log(e);
+    }
+});
 
-app.put("/package/:id", APIpackages.updatePackage);
+app.put("/package/:id", (req, res) => {
+    try {
+        APIpackages.updatePackage(req, res);
+    } catch (e) {
+        res.status(500).send();
+        console.log(e);
+    }
+});
 
-app.delete("/package/:id", APIpackages.deletePackage);
+app.delete("/package/:id", (req, res) => {
+    try {
+        APIpackages.deletePackage(req, res);
+    } catch (e) {
+        res.status(500).send();
+        console.log(e);
+    }
+});
 
-app.get("/packages", APIpackages.getPackages);
+app.get("/package/byName/:name", (req, res) => {
+    try {
+        APIpackages.getHistoryByName(req, res);
+    } catch (e) {
+        res.status(500).send();
+        console.log(e);
+    }
+});
+
+app.delete("/package/byName/:name", (req, res) => {
+    try {
+        APIpackages.deletePackageByName(req, res);
+    } catch (e) {
+        res.status(500).send();
+        console.log(e);
+    }
+});
+
+app.get("/packages", (req, res) => {
+    try {
+        APIpackages.getPackages(req, res);
+    } catch (e) {
+        res.status(500).send();
+        console.log(e);
+    }
+});
 
 app.delete("/reset", async (req, res) => {
-    if (!(await checkAuth(req.headers, true))) {
-        res.status(401).send();
-        return;
+    try {
+        if (!(await checkAuth(req.headers, true))) {
+            res.status(401).send();
+            return;
+        }
+        reset();
+        res.status(200).send();
+    } catch (e) {
+        res.status(500).send();
+        console.log(e);
     }
-    reset();
-    res.status(200).send();
 });
 
 app.listen(process.env.PORT || 3000, () =>

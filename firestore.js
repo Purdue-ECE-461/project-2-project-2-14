@@ -95,7 +95,25 @@ class FirestoreClient {
             .get();
     }
 
-    async runQuery(colPath, queryArr, pageOffset) {
+    async runQuery(colPath, conditions) {
+        const colRef = this.firestore.collection(colPath);
+        const out = [];
+
+        let ref = colRef;
+        conditions.forEach((c) => {
+            ref = ref.where(c.key, c.oper, c.value);
+        });
+
+        const snapshot = await ref.get();
+
+        snapshot.forEach((p) => {
+            out.push(p.data());
+        });
+
+        return out;
+    }
+
+    async runBatchQuery(colPath, queryArr, pageOffset) {
         const colRef = this.firestore.collection(colPath);
         const out = [];
 
@@ -138,13 +156,31 @@ class FirestoreClient {
         docRef.update(updateArg);
     }
 
-    async deleteCollection(collectionPath, batchSize) {
+    async deleteCollection(collectionPath) {
         const collectionRef = this.firestore.collection(collectionPath);
-        const query = collectionRef.orderBy("__name__").limit(batchSize);
+        const query = collectionRef.limit(DELETE_COLLECTION_BATCH);
 
         return new Promise((resolve, reject) => {
             this.deleteQueryBatch(query, resolve).catch(reject);
         });
+    }
+
+    async getPackagesByName(name) {
+        const collectionRef = this.firestore.collection(PACKAGECOLL);
+        const query = collectionRef
+            .limit(DELETE_COLLECTION_BATCH)
+            .where("Name", "==", name);
+
+        return await query.get();
+    }
+
+    async getHistoryByName(name) {
+        const collectionRef = this.firestore.collection(LOGCOLL);
+        const query = collectionRef
+            .orderBy("Date")
+            .where("PackageMetadata.Name", "==", name);
+
+        return await query.get();
     }
 
     async deleteQueryBatch(query, resolve) {
@@ -182,7 +218,7 @@ class Database {
     }
 
     async deleteCollection(collectionPath) {
-        this.fs.deleteCollection(collectionPath, DELETE_COLLECTION_BATCH);
+        await this.fs.deleteCollection(collectionPath);
     }
 
     async saveUser(name, password, isAdmin) {
@@ -247,6 +283,17 @@ class Database {
         return true;
     }
 
+    async uploadToTemp(contentBuf) {
+        const writeStream = await this.fs.getWriteStream(
+            `${config.TMP_FOLDER}`
+        );
+
+        writeStream.write(contentBuf);
+        writeStream.end();
+
+        return true;
+    }
+
     async uploadPackageLocal(contentBuf, metadata) {
         const writeStream = await this.fs.getWriteStream(
             `${config.PACKAGE_KEY}/${metadata.ID}`
@@ -277,7 +324,7 @@ class Database {
     async searchPackagesMetadata(queryArr, offset) {
         const fsQueries = this.parseQueries(queryArr);
 
-        const result = await this.fs.runQuery(
+        const result = await this.fs.runBatchQuery(
             `${config.PACKAGE_KEY}`,
             fsQueries,
             offset
@@ -392,6 +439,56 @@ class Database {
     async deletePackage(id) {
         await this.fs.remove(`${config.PACKAGE_KEY}/${id}`);
         return await this.fs.deletePackage(`${config.PACKAGE_KEY}/${id}`);
+    }
+
+    async saveHistoryLog(authKey, metadata, action) {
+        const logObj = { Action: action, Date: Date.now() };
+
+        const auth = await this.getAuth(authKey);
+        logObj["User"] = { name: auth.username, isAdmin: auth.isAdmin };
+        logObj["PackageMetadata"] = metadata;
+
+        await this.fs.save(
+            `${LOGCOLL}/${generateKey(config.TOKEN_BYTES)}`,
+            logObj
+        );
+    }
+
+    async getHistoryByName(name) {
+        const response = await this.fs.getHistoryByName(name);
+        const logs = [];
+
+        response.forEach((p) => {
+            logs.push(p.data());
+        });
+
+        return logs;
+    }
+
+    async deletePackageByName(name) {
+        const response = await this.fs.getPackagesByName(name);
+        const promiseArr = [];
+
+        response.forEach((p) => {
+            const data = p.data();
+            promiseArr.push(this.deletePackage(data.ID));
+        });
+
+        if (promiseArr.length === 0) {
+            return false;
+        }
+
+        return new Promise((resolve, reject) => {
+            Promise.all(promiseArr).then((values) => {
+                for (const val of values) {
+                    if (!val) {
+                        resolve(false);
+                        return;
+                    }
+                }
+                resolve(true);
+            });
+        });
     }
 }
 
