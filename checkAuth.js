@@ -1,5 +1,5 @@
-import config from "./config";
-import db from "./firestore";
+const config = require("./config");
+const db = require("./firestore");
 
 async function checkAuth(headers, isAdmin) {
     const token = headers["x-authorization"];
@@ -20,4 +20,4 @@ async function checkAuth(headers, isAdmin) {
     return true;
 }
 
-export default checkAuth;
+module.exports = checkAuth;

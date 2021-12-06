@@ -1,9 +1,11 @@
-import config from "./config";
-import { decodeVersion, encodeVersion } from "./helper";
-import db from "./firestore";
-import checkAuth from "./checkAuth";
-import spawn from "child_process";
-import { getGithubDefaultBranchName } from "get-github-default-branch-name";
+const config = require("./config");
+const { decodeVersion, encodeVersion } = require("./helper");
+const db = require("./firestore");
+const checkAuth = require("./checkAuth");
+const spawn = require("child_process").spawn;
+const {
+    getGithubDefaultBranchName,
+} = require("get-github-default-branch-name");
 
 async function getPackages(req, res) {
     if (!(await checkAuth(req.headers, false))) {
@@ -50,16 +52,6 @@ async function getHistoryByName(req, res) {
 
     const logs = await db.getHistoryByName(name);
 
-    res.status(200).json(logs);
-}
-
-async function getSensitivePackageHistory(req, res) {
-    if (!(await checkAuth(req.headers, false))) {
-        res.status(401).send();
-        return;
-    }
-
-    const logs = await db.getSensitiveLog();
     res.status(200).json(logs);
 }
 
@@ -114,7 +106,6 @@ async function getPackage(req, res) {
         res.status(400).send("ID not defined");
         return;
     }
-
     const readStream = await db.downloadPackage(id);
 
     if (readStream === null) {
@@ -129,9 +120,6 @@ async function getPackage(req, res) {
 
     db.getPackageMetadata(id).then((metadata) => {
         db.saveHistoryLog(req.headers["x-authorization"], metadata, "DOWNLOAD");
-        if (metadata.isSensitive) {
-            db.saveSensitiveLog(req.headers["x-authorization"], metadata);
-        }
     });
 }
 
@@ -337,7 +325,6 @@ module.exports = {
     updatePackage,
     deletePackageByName,
     getHistoryByName,
-    getSensitivePackageHistory,
 };
 
 /* *******************************************
