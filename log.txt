@@ -1,0 +1,2 @@
+2021-12-06 16:12:35,030 DEBUG: Logger configured
+2021-12-06 16:12:35,031 INFO: logger created

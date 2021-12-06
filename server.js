@@ -1,4 +1,3 @@
-const config = require("./config");
 const reset = require("./reset");
 reset();
 
@@ -8,6 +7,7 @@ const checkAuth = require("./checkAuth");
 const APIusers = require("./APIusers");
 const APIpackages = require("./APIpackages");
 
+// create the express app
 const app = express();
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static("public"));
@@ -16,6 +16,10 @@ app.get(`/`, (req, res) => {
     res.send("<h1>ECE 461 Project 2 Group 14</h1>");
 });
 
+// The detailed documentation of these endpoints can be found
+// in the readme.md.
+// The handler functions for every endpoint can be found it
+// APIusers.js or APIpackages.js
 app.put(`/authenticate`, (req, res) => {
     try {
         APIusers.authenticate(req, res);
