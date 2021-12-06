@@ -1,14 +1,14 @@
-const config = require("./config");
-const crypto = require("crypto");
+import { TOKEN_BYTES as _TOKEN_BYTES } from "./config";
+import { createHash, randomBytes } from "crypto";
 
-const TOKEN_BYTES = config.TOKEN_BYTES;
+const TOKEN_BYTES = _TOKEN_BYTES;
 
 function generateHash(string) {
-    return crypto.createHash("md5").update(string).digest("hex");
+    return createHash("md5").update(string).digest("hex");
 }
 
 function generateKey(len) {
-    return crypto.randomBytes(len).toString("hex");
+    return randomBytes(len).toString("hex");
 }
 
 async function __waitFor(ms) {
@@ -39,7 +39,7 @@ function encodeVersion(versionStr) {
     return out;
 }
 
-module.exports = {
+export default {
     generateHash,
     generateKey,
     __waitFor,

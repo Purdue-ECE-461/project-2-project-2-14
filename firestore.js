@@ -1,15 +1,27 @@
-const config = require("./config");
-const path = require("path");
-const { generateKey, encodeVersion, decodeVersion } = require("./helper");
-const https = require("https");
-const { createReadStream } = require("fs");
+import {
+    USER_KEY,
+    PACKAGE_KEY,
+    LOG_KEY,
+    SENSITIVE_KEY,
+    AUTH_KEY,
+    DELETE_COLLECTION_BATCH as _DELETE_COLLECTION_BATCH,
+    BUCKET_NAME,
+    OFFSET_SIZE,
+    TMP_FOLDER,
+    TOKEN_BYTES,
+} from "./config";
+import path from "path";
+import { generateKey, encodeVersion, decodeVersion } from "./helper";
+import { get as _get } from "https";
+import { createReadStream } from "fs";
 
-const USERCOLL = config.USER_KEY;
-const PACKAGECOLL = config.PACKAGE_KEY;
-const LOGCOLL = config.LOG_KEY;
-const AUTHCOLL = config.AUTH_KEY;
+const USERCOLL = USER_KEY;
+const PACKAGECOLL = PACKAGE_KEY;
+const LOGCOLL = LOG_KEY;
+const SENSITIVECOL = SENSITIVE_KEY;
+const AUTHCOLL = AUTH_KEY;
 
-const DELETE_COLLECTION_BATCH = config.DELETE_COLLECTION_BATCH;
+const DELETE_COLLECTION_BATCH = _DELETE_COLLECTION_BATCH;
 
 class FirestoreClient {
     constructor() {
@@ -18,7 +30,7 @@ class FirestoreClient {
         var serviceAccount = require("./ece461project2-adminkey.json");
         this.admin.initializeApp({
             credential: this.admin.credential.cert(serviceAccount),
-            storageBucket: config.BUCKET_NAME,
+            storageBucket: BUCKET_NAME,
         });
         this.firestore = this.admin.firestore();
         this.bucket = this.admin.storage().bucket();
@@ -63,7 +75,7 @@ class FirestoreClient {
         }
         // console.log(files);
         const packageFiles = files.filter((f) =>
-            f.metadata.id.includes(`/${config.PACKAGE_KEY}/`)
+            f.metadata.id.includes(`/${PACKAGE_KEY}/`)
         );
         packageFiles.forEach(async (f) => {
             await f.delete();
@@ -90,8 +102,8 @@ class FirestoreClient {
         const colRef = this.firestore.collection(colPath);
         return await colRef
             .orderBy("Name")
-            .limit(config.OFFSET_SIZE)
-            .offset(config.OFFSET_SIZE * offset)
+            .limit(OFFSET_SIZE)
+            .offset(OFFSET_SIZE * offset)
             .get();
     }
 
@@ -118,7 +130,7 @@ class FirestoreClient {
         const out = [];
 
         let index = 0;
-        const offset = pageOffset * config.OFFSET_SIZE;
+        const offset = pageOffset * OFFSET_SIZE;
 
         for (const conditions of queryArr) {
             let ref = colRef;
@@ -134,10 +146,11 @@ class FirestoreClient {
                         index++;
                         return;
                     }
-                    if (index >= offset + config.OFFSET_SIZE) {
+                    if (index >= offset + OFFSET_SIZE) {
                         throw "break";
                     }
                     out.push(p.data());
+                    console.log(p.data());
                     index++;
                 });
             } catch (e) {}
@@ -170,6 +183,13 @@ class FirestoreClient {
         const query = collectionRef
             .limit(DELETE_COLLECTION_BATCH)
             .where("Name", "==", name);
+
+        return await query.get();
+    }
+
+    async getSensitiveLog() {
+        const collectionRef = this.firestore.collection(SENSITIVECOL);
+        const query = collectionRef.orderBy("Date");
 
         return await query.get();
     }
@@ -270,10 +290,10 @@ class Database {
 
     async uploadPackagePublic(downloadUrl, metadata) {
         const writeStream = await this.fs.getWriteStream(
-            `${config.PACKAGE_KEY}/${metadata.ID}`
+            `${PACKAGE_KEY}/${metadata.ID}`
         );
 
-        const response = https.get(downloadUrl, function (response) {
+        const response = _get(downloadUrl, function (response) {
             if (!response || response.statusCode !== 200) {
                 return false;
             }
@@ -284,9 +304,7 @@ class Database {
     }
 
     async uploadToTemp(contentBuf) {
-        const writeStream = await this.fs.getWriteStream(
-            `${config.TMP_FOLDER}`
-        );
+        const writeStream = await this.fs.getWriteStream(`${TMP_FOLDER}`);
 
         writeStream.write(contentBuf);
         writeStream.end();
@@ -296,7 +314,7 @@ class Database {
 
     async uploadPackageLocal(contentBuf, metadata) {
         const writeStream = await this.fs.getWriteStream(
-            `${config.PACKAGE_KEY}/${metadata.ID}`
+            `${PACKAGE_KEY}/${metadata.ID}`
         );
 
         writeStream.write(contentBuf);
@@ -311,7 +329,7 @@ class Database {
 
     async getAllPackagesMetadata(offset) {
         const packages = await this.fs.getAllFromCollection(
-            `${config.PACKAGE_KEY}`,
+            `${PACKAGE_KEY}`,
             offset
         );
         const out = [];
@@ -323,9 +341,9 @@ class Database {
 
     async searchPackagesMetadata(queryArr, offset) {
         const fsQueries = this.parseQueries(queryArr);
-
+        console.log(fsQueries);
         const result = await this.fs.runBatchQuery(
-            `${config.PACKAGE_KEY}`,
+            `${PACKAGE_KEY}`,
             fsQueries,
             offset
         );
@@ -429,16 +447,45 @@ class Database {
     }
 
     async checkPackage(id) {
-        return await this.fs.exists(`${config.PACKAGE_KEY}/${id}`);
+        return await this.fs.exists(`${PACKAGE_KEY}/${id}`);
     }
 
     async downloadPackage(id) {
-        return await this.fs.getReadStream(`${config.PACKAGE_KEY}/${id}`);
+        return await this.fs.getReadStream(`${PACKAGE_KEY}/${id}`);
     }
 
     async deletePackage(id) {
-        await this.fs.remove(`${config.PACKAGE_KEY}/${id}`);
-        return await this.fs.deletePackage(`${config.PACKAGE_KEY}/${id}`);
+        await this.fs.remove(`${PACKAGE_KEY}/${id}`);
+        return await this.fs.deletePackage(`${PACKAGE_KEY}/${id}`);
+    }
+
+    async saveSensitiveLog(authKey, metadata) {
+        const logObj = { Date: Date.now() };
+
+        const auth = await this.getAuth(authKey);
+        logObj["User"] = { name: auth.username, isAdmin: auth.isAdmin };
+        logObj["PackageMetadata"] = metadata;
+
+        await this.fs.save(
+            `${SENSITIVECOL}/${generateKey(TOKEN_BYTES)}`,
+            logObj
+        );
+    }
+
+    async getSensitiveLog() {
+        const response = await this.fs.getSensitiveLog();
+        const logs = [];
+
+        response.forEach((p) => {
+            const data = p.data();
+            data.PackageMetadata.Version = decodeVersion(
+                data.PackageMetadata.Version
+            );
+            data.Date = new Date(data.Date).toString();
+            logs.push(data);
+        });
+
+        return logs;
     }
 
     async saveHistoryLog(authKey, metadata, action) {
@@ -448,10 +495,7 @@ class Database {
         logObj["User"] = { name: auth.username, isAdmin: auth.isAdmin };
         logObj["PackageMetadata"] = metadata;
 
-        await this.fs.save(
-            `${LOGCOLL}/${generateKey(config.TOKEN_BYTES)}`,
-            logObj
-        );
+        await this.fs.save(`${LOGCOLL}/${generateKey(TOKEN_BYTES)}`, logObj);
     }
 
     async getHistoryByName(name) {
@@ -459,7 +503,12 @@ class Database {
         const logs = [];
 
         response.forEach((p) => {
-            logs.push(p.data());
+            const data = p.data();
+            data.PackageMetadata.Version = decodeVersion(
+                data.PackageMetadata.Version
+            );
+            data.Date = new Date(data.Date).toString();
+            logs.push(data);
         });
 
         return logs;
@@ -492,4 +541,4 @@ class Database {
     }
 }
 
-module.exports = new Database();
+export default new Database();

@@ -1,7 +1,7 @@
-const config = require("./config");
-const checkAuth = require("./checkAuth");
-const helper = require("./helper");
-const db = require("./firestore");
+import { TOKEN_BYTES, ADMIN_USERNAME } from "./config";
+import checkAuth from "./checkAuth";
+import helper from "./helper";
+import db from "./firestore";
 
 async function authenticate(req, res) {
     const user = req.body.User;
@@ -25,7 +25,7 @@ async function authenticate(req, res) {
         db.removeAuth(userData.authToken);
     }
 
-    const token = helper.generateKey(config.TOKEN_BYTES);
+    const token = helper.generateKey(TOKEN_BYTES);
     userData.authToken = token;
     db.updateUser(user.name, userData);
 
@@ -49,7 +49,7 @@ async function createNewUser(req, res) {
         return;
     }
 
-    if (username === config.ADMIN_USERNAME) {
+    if (username === ADMIN_USERNAME) {
         res.status(400).send("Cannot use the username provided");
     }
     // TODO: check is username is not taken
@@ -71,7 +71,7 @@ async function deleteUser(req, res) {
         return;
     }
 
-    if (username === config.ADMIN_USERNAME) {
+    if (username === ADMIN_USERNAME) {
         res.status(400).send("Cannot delete the username");
     }
 
@@ -80,7 +80,7 @@ async function deleteUser(req, res) {
     res.status(200).send();
 }
 
-module.exports = {
+export default {
     authenticate,
     createNewUser,
     deleteUser,

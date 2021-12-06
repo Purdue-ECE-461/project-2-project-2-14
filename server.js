@@ -1,18 +1,24 @@
-const config = require("./config");
-const reset = require("./reset");
-// reset();
+import reset from "./reset";
+reset();
 
-const express = require("express");
+import express, { json, static } from "express";
 
-const db = require("./firestore");
-
-const checkAuth = require("./checkAuth");
-const APIusers = require("./APIusers");
-const APIpackages = require("./APIpackages");
+import checkAuth from "./checkAuth";
+import { authenticate, createNewUser, deleteUser } from "./APIusers";
+import {
+    addPackage,
+    getPackage,
+    updatePackage,
+    deletePackage,
+    getHistoryByName,
+    deletePackageByName,
+    getPackages,
+    getSensitivePackageHistory,
+} from "./APIpackages";
 
 const app = express();
-app.use(express.json({ limit: "1mb" }));
-app.use(express.static("public"));
+app.use(json({ limit: "1mb" }));
+app.use(static("public"));
 
 app.get(`/`, (req, res) => {
     res.send("<h1>ECE 461 Project 2 Group 14</h1>");
@@ -20,7 +26,7 @@ app.get(`/`, (req, res) => {
 
 app.put(`/authenticate`, (req, res) => {
     try {
-        APIusers.authenticate(req, res);
+        authenticate(req, res);
     } catch (e) {
         res.status(500).send();
         console.log(e);
@@ -29,7 +35,7 @@ app.put(`/authenticate`, (req, res) => {
 
 app.post(`/user`, (req, res) => {
     try {
-        APIusers.createNewUser(req, res);
+        createNewUser(req, res);
     } catch (e) {
         res.status(500).send();
         console.log(e);
@@ -38,7 +44,7 @@ app.post(`/user`, (req, res) => {
 
 app.delete(`/user`, (req, res) => {
     try {
-        APIusers.deleteUser(req, res);
+        deleteUser(req, res);
     } catch (e) {
         res.status(500).send();
         console.log(e);
@@ -47,7 +53,7 @@ app.delete(`/user`, (req, res) => {
 
 app.post(`/package`, (req, res) => {
     try {
-        APIpackages.addPackage(req, res);
+        addPackage(req, res);
     } catch (e) {
         res.status(500).send();
         console.log(e);
@@ -56,7 +62,7 @@ app.post(`/package`, (req, res) => {
 
 app.get("/package/:id", (req, res) => {
     try {
-        APIpackages.getPackage(req, res);
+        getPackage(req, res);
     } catch (e) {
         res.status(500).send();
         console.log(e);
@@ -65,7 +71,7 @@ app.get("/package/:id", (req, res) => {
 
 app.put("/package/:id", (req, res) => {
     try {
-        APIpackages.updatePackage(req, res);
+        updatePackage(req, res);
     } catch (e) {
         res.status(500).send();
         console.log(e);
@@ -74,7 +80,7 @@ app.put("/package/:id", (req, res) => {
 
 app.delete("/package/:id", (req, res) => {
     try {
-        APIpackages.deletePackage(req, res);
+        deletePackage(req, res);
     } catch (e) {
         res.status(500).send();
         console.log(e);
@@ -83,7 +89,7 @@ app.delete("/package/:id", (req, res) => {
 
 app.get("/package/byName/:name", (req, res) => {
     try {
-        APIpackages.getHistoryByName(req, res);
+        getHistoryByName(req, res);
     } catch (e) {
         res.status(500).send();
         console.log(e);
@@ -92,7 +98,7 @@ app.get("/package/byName/:name", (req, res) => {
 
 app.delete("/package/byName/:name", (req, res) => {
     try {
-        APIpackages.deletePackageByName(req, res);
+        deletePackageByName(req, res);
     } catch (e) {
         res.status(500).send();
         console.log(e);
@@ -101,7 +107,16 @@ app.delete("/package/byName/:name", (req, res) => {
 
 app.get("/packages", (req, res) => {
     try {
-        APIpackages.getPackages(req, res);
+        getPackages(req, res);
+    } catch (e) {
+        res.status(500).send();
+        console.log(e);
+    }
+});
+
+app.get("/packages/sensitive", (req, res) => {
+    try {
+        getSensitivePackageHistory(req, res);
     } catch (e) {
         res.status(500).send();
         console.log(e);
