@@ -13,8 +13,8 @@ from repo import Repo
 
 def main():
     # Set up logger
-    Log.init()
-    Log.info('logger created')
+    # Log.init()
+    # Log.info('logger created')
 
     # Parse command
     invalid = False
@@ -33,7 +33,7 @@ def main():
         os.system('pip3 install pytest-cov > temp/dependencies.log')
         print('8 dependencies installed...')
     elif (sys.argv[1] == 'test'):  # mode 2
-        Log.info('Testing started')
+        # Log.info('Testing started')
         os.system('rm tests.log')
         os.system('pytest --cov=./ > tests.log')
         parser = Parser()
@@ -45,12 +45,12 @@ def main():
             f'{parser.passed}/{parser.passed + parser.failed} test cases passed. {parser.coverage}%% line coverage achieved.')
     elif (sys.argv[1] == 'load'):
         # load_dotenv()
-        Log.info('.env file loaded')
+        # Log.info('.env file loaded')
         print('.env loaded')
     elif (sys.argv[1] == 'build'):
         os.system(
             f'pyinstaller -F --distpath ./ -n run --hidden-import _cffi_backend main.py')
-        Log.info('System built for execution')
+        # Log.info('System built for execution')
     elif (sys.argv[1] == 'clean'):
         os.system(f'pyinstaller --clean run')
         os.system(f'rm -rf build/')
@@ -65,12 +65,12 @@ def main():
         input = InputFile()
         datasource = DatasourceGithub()
         output = OutputStdOut()
-        Log.info('Modules intialized')
+        # Log.info('Modules intialized')
         # get inputs
         # input.getUrls(sys.argv[1])
         input.urls = sys.argv[1]
         # print(type(input.urls))
-        Log.info('URLs retrieved')
+        # Log.info('URLs retrieved')
         # create repo listings
         repos = []
         # for url in input.urls:

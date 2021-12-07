@@ -40,16 +40,20 @@ class Log:
 
     @staticmethod
     def info(msg):
-        logging.info(msg)
+        pass
+        # logging.info(msg)
 
     @staticmethod
     def debug(msg):
-        logging.debug(msg)
+        pass
+        # logging.debug(msg)
 
     @staticmethod
     def warning(msg):
-        logging.warning(msg)
+        pass
+        # logging.warning(msg)
 
     @staticmethod
     def error(msg):
-        logging.error(msg)
+        pass
+        # logging.error(msg)

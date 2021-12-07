@@ -114,7 +114,7 @@ async function rateUserRepo(req, res){
     let url = `https://github.com/${req.params.user}/${req.params.repo}`
     console.log(url);
     const exec = require("child_process").execSync;
-    data = exec(`python3 rating/main.py ${url}`).toString();
+    data = exec(`python3 -B rating/main.py ${url}`).toString();
     data = data.split(" ");
     data[6] = data[6].slice(0, -1);
     console.log(data);
@@ -127,7 +127,7 @@ async function rateUserRepo(req, res){
         "GoodPinningPractice": Number(data[6])
     }
     res.status(200)
-    res.end(JSON.stringify(json, null, 3));
+    res.send(json);
     // res.status(200).send(data);
 }
 
