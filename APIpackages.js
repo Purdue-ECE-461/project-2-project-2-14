@@ -282,7 +282,7 @@ async function upload(packageUrl, content, metadata) {
         return null;
     }
     // return the metadata with the url of the package saved and empty the tmp folder
-    // emptyTmp();
+    emptyTmp();
     return metadata;
 }
 
