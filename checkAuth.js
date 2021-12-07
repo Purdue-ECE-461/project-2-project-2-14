@@ -23,7 +23,7 @@ async function checkAuth(headers, isAdmin) {
 
     // check if the token is expired
     if (
-        auth.timestamp + config.TOKEN_TTL > Date.now() ||
+        auth.timestamp + config.TOKEN_TTL < Date.now() ||
         auth.numRequests > config.MAX_REQUESTS_PER_TOKEN
     ) {
         return false;

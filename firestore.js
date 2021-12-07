@@ -259,6 +259,10 @@ class Database {
         return response.data();
     }
 
+    async checkUser(name) {
+        return await this.fs.exists(`${config.USER_KEY}/${name}`);
+    }
+
     async saveAuth(token, username, isAdmin) {
         const auth = {
             token: token,
@@ -513,5 +517,7 @@ class Database {
         });
     }
 }
+const instance = new Database();
+Object.freeze(instance);
 
-module.exports = new Database();
+module.exports = instance;

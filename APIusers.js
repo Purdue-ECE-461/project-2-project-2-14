@@ -55,8 +55,14 @@ async function createNewUser(req, res) {
 
     if (username === config.ADMIN_USERNAME) {
         res.status(400).send("Cannot use the username provided");
+        return;
     }
-    // TODO: check is username is not taken
+
+    if (await db.checkUser(username)) {
+        res.status(400).send("Username is already taken");
+        return;
+    }
+
     await db.saveUser(username, helper.generateHash(password), isAdmin);
 
     res.status(200).send();
