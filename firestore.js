@@ -1,8 +1,7 @@
 const config = require("./config");
 const fs = require("fs");
 const { generateKey, encodeVersion, decodeVersion } = require("./helper");
-
-const { createReadStream } = require("fs");
+const Stream = require("stream");
 
 const USERCOLL = config.USER_KEY;
 const PACKAGECOLL = config.PACKAGE_KEY;
@@ -515,6 +514,16 @@ class Database {
                 resolve(true);
             });
         });
+    }
+
+    async writeLogFile(filename, logs) {
+        const writeStream = await this.fs.getWriteStream(
+            `${config.LOG_FOLDER}/${filename}`
+        );
+        const readStream = new Stream.Readable.from(logs);
+        readStream.pipe(writeStream);
+
+        console.log("Writing logs");
     }
 }
 const instance = new Database();

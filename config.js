@@ -21,4 +21,6 @@ module.exports = {
     MIN_SCORE: 0.5,
     MAX_REQUESTS_PER_TOKEN: 1000,
     TOKEN_TTL: 10 * 60 * 60 * 1000,
+    LOG_BUFFER_SIZE: 10,
+    LOG_FOLDER: "debug_logs",
 };

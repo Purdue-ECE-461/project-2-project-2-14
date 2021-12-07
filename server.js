@@ -1,5 +1,6 @@
 require("dotenv").config();
 const reset = require("./reset");
+const logger = require("./logger");
 
 const express = require("express");
 
@@ -153,6 +154,7 @@ app.delete("/reset", async (req, res) => {
     }
 });
 
+let index = 0;
 console.log("Starting up...");
 async function startup(flag) {
     await emptyTmp();
