@@ -20,10 +20,13 @@ class ScoreDependencies(Score):
         # print(g.get_user(id))
         user, repo = id.split("/")
         dependencies = self.getDependencies(user, repo)
+        if (len(dependencies) < 1):
+            self.score = 0; # -----------------
+        else:
         # //print(dependencies) 
-        num = self.processDependencies(dependencies)
+            num = self.processDependencies(dependencies)
         # //print(num)
-        self.score = float(num/len(dependencies))
+            self.score = float(num/len(dependencies))
         
 
 
@@ -61,10 +64,13 @@ class ScoreDependencies(Score):
 
         i = 1
         dependencyList = []
-        for key in data["dependencies"].values():
-            dependencyList.append(key)
-            #print(key, type(key),i)
-            i += 1
+        try:
+            for key in data["dependencies"].values():
+                dependencyList.append(key)
+                #print(key, type(key),i)
+                i += 1
+        except KeyError:
+            dependencyList = []
         
         return dependencyList
 
@@ -79,6 +85,5 @@ class ScoreDependencies(Score):
         for dependency in data:
             if(self.checkDependency(dependency)):
                 num += 1
-            else:
-                print(dependency)
+                # print(dependency)
         return num

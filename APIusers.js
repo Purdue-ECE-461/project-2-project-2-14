@@ -16,7 +16,7 @@ async function authenticate(req, res) {
     const passwordHash = helper.generateHash(password); // TODO: add salt to hash
 
     const userData = await db.getUser(user.name);
-    if (userData === undefined || passwordHash !== userData.passwordHash) {
+    if (userData === null || passwordHash !== userData.passwordHash) {
         res.status(401).send("No such user or invalid password");
         return;
     }

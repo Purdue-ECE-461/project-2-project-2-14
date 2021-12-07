@@ -11,4 +11,11 @@ module.exports = {
     OFFSET_SIZE: 5,
     ADMIN_USERNAME: "admin",
     TMP_FOLDER: "tmp",
+    BUS_FACTOR_SCORE: "BusFactor",
+    CORRECTNESS_SCORE: "Correctness",
+    RAMP_UP_SCORE: "RampUp",
+    RESPONSIVE_MAINTAINER_SCORE: "ResponsiveMaintainer",
+    LICENSE_SCORE: "LicenseScore",
+    GOOD_PINNING_SCORE: "GoodPinningPractice",
+    MIN_SCORE: 0.5,
 };

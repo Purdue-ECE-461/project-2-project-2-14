@@ -1,5 +1,5 @@
+require("dotenv").config();
 const reset = require("./reset");
-reset();
 
 const express = require("express");
 
@@ -83,6 +83,25 @@ app.delete("/package/:id", (req, res) => {
     }
 });
 
+app.get("/package/:id/rate", (req, res) => {
+    try {
+        APIpackages.rateUserRepo(req, res);
+    } catch (e) {
+        res.status(500).send();
+        console.log(e);
+    }
+});
+
+// TRIAL
+app.get("/:repo/:user/rate", (req, res) => {
+    try {
+        APIpackages.rateUserRepo(req, res);
+    } catch (e) {
+        res.status(500).send();
+        console.log(e);
+    }
+});
+
 app.get("/package/byName/:name", (req, res) => {
     try {
         APIpackages.getHistoryByName(req, res);
@@ -133,6 +152,20 @@ app.delete("/reset", async (req, res) => {
     }
 });
 
-app.listen(process.env.PORT || 3000, () =>
-    console.log(`Server is running on port ${process.env.PORT || 3000}`)
-);
+console.log("Starting up...");
+function startup(flag) {
+    if (flag) {
+        reset().then(() => {
+            app.listen(process.env.PORT || 3000, () =>
+                console.log(
+                    `Server is running on port ${process.env.PORT || 3000}`
+                )
+            );
+        });
+    } else {
+        app.listen(process.env.PORT || 3000, () =>
+            console.log(`Server is running on port ${process.env.PORT || 3000}`)
+        );
+    }
+}
+startup(true);

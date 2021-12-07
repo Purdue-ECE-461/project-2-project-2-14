@@ -2,6 +2,8 @@ rating/log.txt
 temp/
 ./log.txt
 /node_modules
+/trial
+base64.js
 
 
 node_modules/.bin/acorn

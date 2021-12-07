@@ -4,7 +4,7 @@
     "description": "",
     "main": "server.js",
     "scripts": {
-        "test": "jest --",
+        "test": "jest --runInBand",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
         "coverage": "npx jest --collectCoverage --"
     },
@@ -21,6 +21,7 @@
     "homepage": "https://github.com/Purdue-ECE-461/project-2-project-2-14#readme",
     "dependencies": {
         "@google-cloud/firestore": "^4.15.1",
+        "dotenv": "^10.0.0",
         "express": "^4.17.1",
         "firebase-admin": "^10.0.0",
         "get-github-default-branch-name": "0.0.4",

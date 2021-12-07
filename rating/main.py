@@ -59,23 +59,27 @@ def main():
         os.system(f'rm -rf __pycache__/')
         os.system(f'rm -rf run')
         Log.info('Clean succesful')
-    elif (os.path.exists(sys.argv[1])):  # mode 3
+    # elif (os.path.exists(sys.argv[1])):  # mode 3 -------------------
+    elif (sys.argv[1] != None):
         # initlialize modules
         input = InputFile()
         datasource = DatasourceGithub()
         output = OutputStdOut()
         Log.info('Modules intialized')
         # get inputs
-        input.getUrls(sys.argv[1])
+        # input.getUrls(sys.argv[1])
+        input.urls = sys.argv[1]
+        # print(type(input.urls))
         Log.info('URLs retrieved')
         # create repo listings
         repos = []
-        for url in input.urls:
-            repo = Repo()
-            repo.parseUrl(url, datasource)
-            if (repo.id != None):
-                repos.append(repo)
+        # for url in input.urls:
+        repo = Repo()
+        repo.parseUrl(input.urls, datasource)
+        if (repo.id != None):
+            repos.append(repo)
         # get scores
+        # print(repo)
         for repo in repos:
             Log.info(f'Calculating scores for \'{repo.id}\'...')
             for score in repo.scores:

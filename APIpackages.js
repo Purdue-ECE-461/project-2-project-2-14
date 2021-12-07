@@ -2,13 +2,21 @@
 // that are related to packages
 
 const config = require("./config");
-const { decodeVersion, encodeVersion } = require("./helper");
+const {
+    decodeVersion,
+    encodeVersion,
+    emptyTmp,
+    unzipTmp,
+    getUrlFromPackageFiles,
+    checkMetadata,
+} = require("./helper");
 const db = require("./firestore");
 const checkAuth = require("./checkAuth");
-const spawn = require("child_process").spawn;
+const fs = require("fs");
 const {
     getGithubDefaultBranchName,
 } = require("get-github-default-branch-name");
+const https = require("https");
 
 // gets all the packages that match the queries
 // paginated with a page size of OFFSET_SIZE in config.js
@@ -182,6 +190,10 @@ async function addPackage(req, res) {
         res.status(400).send();
         return;
     }
+    if (metadata.error !== undefined) {
+        res.status(400).send(metadata.error);
+        return;
+    }
     res.status(200).json(metadata);
 
     // encode the version string to a format that is easier to compare
@@ -234,76 +246,77 @@ async function updatePackage(req, res) {
     }
 
     // upload the data based on the data object in the body
-    let success = upload(packageUrl, content, metadata);
-    if (!success) {
+    metadata = await upload(packageUrl, content, metadata);
+    if (!metadata) {
         res.status(400).send();
         return;
     }
+    if (metadata.error !== undefined) {
+        res.status(400).send(metadata.error);
+        return;
+    }
 
-    // save the log of the action and respond with the metadata
+    // save the log of the action and the new metadata
+    db.savePackageMetadata(metadata);
     db.saveHistoryLog(req.headers["x-authorization"], metadata, "UPDATE");
-    // decode the version string back to the original form before sending it
-    // back to the user
+
+    // decode the version string before sending it back
     metadata.Version = decodeVersion(metadata.Version);
     res.status(200).json(metadata);
 }
 
-// checks if the 3 fields in the two metadata are equal
-// ID, Version, and Name
-function checkMetadata(oldData, newData) {
-    if (!oldData || !newData) {
-        return false;
-    }
-    return (
-        oldData.ID === newData.ID &&
-        // encode the Version string of the new data before comparing
-        oldData.Version === encodeVersion(newData.Version) &&
-        oldData.Name === newData.Name
-    );
-}
-
 // uploads a zip to the database based on the packageUrl and content parameters
 async function upload(packageUrl, content, metadata) {
-    let success = false;
-
     // if the packageUrl is provided get the package zip from the url
     if (packageUrl) {
-        // const canIngest = await checkIngestibility(await rate(packageUrl));
-        // if (!canIngest) {
-        //     res.status(200).send("Could not ingest because bad package");
-        //     return;
-        // }
-        metadata.URL = packageUrl;
-        success = await saveRepo(packageUrl, metadata);
+        metadata = await addRepo(packageUrl, metadata);
     }
     // if the package url is not provided get the zip from the content
     // which is a base64 encoded string of the zip data
     else if (content) {
-        //TODO: get github link out of zip
         const zippedBuf = Buffer.from(content, "base64");
-
-        // if (!(await db.uploadToTemp(unzippedBuf))) {
-        //     return null;
-        // }
-
-        success = await saveZip(zippedBuf, metadata);
+        metadata = await addZip(zippedBuf, metadata);
     }
 
-    if (!success) {
+    if (!metadata) {
         return null;
     }
-    // return the metadata with the url of the package saved
+    // return the metadata with the url of the package saved and empty the tmp folder
+    emptyTmp();
     return metadata;
 }
 
 // save the contents of the content buffer in the database
-async function saveZip(contentBuf, metadata) {
-    metadata = await db.uploadPackageLocal(contentBuf, metadata);
+async function addZip(contentBuf, metadata) {
+    fs.writeFileSync(
+        `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`,
+        contentBuf
+    );
+
+    const unzipPath = await unzipTmp();
+
+    const url = getUrlFromPackageFiles(unzipPath);
+    if (url === null) {
+        return { error: "could not find or read package.json" };
+    }
+    metadata.url = url;
+
+    const rating = await rate(url, unzipPath);
+    metadata.rating = rating;
+
+    let success = await db.uploadPackage(
+        `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`,
+        metadata
+    );
+    if (!success) {
+        return null;
+    }
     return metadata;
 }
 
 // get the zip of the default branch and save it in the database
-async function saveRepo(url, metadata) {
+async function addRepo(url, metadata) {
+    metadata.url = url;
     // remove the host name from the url
     try {
         var packageInfo = url.split("github.com/")[1];
@@ -324,30 +337,107 @@ async function saveRepo(url, metadata) {
 
     // create the download url and save it in the database
     const downloadUrl = `https://codeload.github.com/${owner}/${name}/zip/heads/${defaultBranch}`;
-    metadata = await db.uploadPackagePublic(downloadUrl, metadata);
+
+    let success = await new Promise((resolve, reject) => {
+        https.get(downloadUrl, function (response) {
+            if (!response || response.statusCode !== 200) {
+                return false;
+            }
+            const stream = response.pipe(
+                fs.createWriteStream(
+                    `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`
+                )
+            );
+
+            stream.on("finish", () => {
+                resolve(true);
+            });
+
+            stream.on("error", () => {
+                resolve(false);
+            });
+        });
+    });
+    if (!success) {
+        return null;
+    }
+
+    const unzipPath = await unzipTmp();
+    if (!unzipPath) {
+        return null;
+    }
+
+    const rating = await rate(url, unzipPath);
+    if (!checkRating(rating)) {
+        return { error: "package did not have the needed score" };
+    }
+    metadata.rating = rating;
+
+    success = await db.uploadPackage(
+        `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`,
+        metadata
+    );
+    if (!success) {
+        return null;
+    }
 
     return metadata;
 }
 
-async function rate(moduleURL) {
-    const fs = require("fs");
-    const exec = require("child_process").execSync;
-    exec("touch ./rating/url.txt");
-    exec(`echo ${moduleURL} >> ./rating/url.txt`);
-    console.log("rating");
-    exec(
-        "rating/env/bin/python3.8 rating/main.py rating/url.txt >> rating/result.txt"
+function checkRating(rating) {
+    if (!rating) {
+        return false;
+    }
+    const min = config.MIN_SCORE;
+    return (
+        rating[config.BUS_FACTOR_SCORE] > min &&
+        rating[config.CORRECTNESS_SCORE] > min &&
+        rating[config.RAMP_UP_SCORE] > min &&
+        rating[config.RESPONSIVE_MAINTAINER_SCORE] > min &&
+        rating[config.LICENSE_SCORE] > min &&
+        rating[config.GOOD_PINNING_SCORE] > min
     );
+}
 
-    var content = fs.readFileSync("rating/result.txt", "utf8");
-    exec("rm rating/url.txt");
-    exec("rm rating/result.txt");
-    console.log("rated");
-    content = content.split(" ");
-    content[6] = content[6].slice(0, -1);
+async function rate(url, packagePath) {
+    console.log(url);
+    console.log(packagePath);
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve({
+                BusFactor: 1,
+                Correctness: 1,
+                RampUp: 1,
+                ResponsiveMaintainer: 1,
+                LicenseScore: 1,
+                GoodPinningPractice: 1,
+            });
+        }, 1000);
+    });
+}
 
-    return content;
-} // rates the module and returns the result as an array of 7 values
+async function rateUserRepo(req, res) {
+    let url = `https://github.com/${req.params.user}/${req.params.repo}`;
+    console.log(url);
+    const exec = require("child_process").execSync;
+    data = exec(
+        `./rating/env/bin/python3.8 -B ./rating/main.py ${url}`
+    ).toString();
+    data = data.split(" ");
+    data[6] = data[6].slice(0, -1);
+    console.log(data);
+    let json = {
+        RampUp: Number(data[1]),
+        Correctness: Number(data[2]),
+        BusFactor: Number(data[3]),
+        ResponsiveMaintainer: Number(data[4]),
+        LicenseScore: Number(data[5]),
+        GoodPinningPractice: Number(data[6]),
+    };
+    res.status(200);
+    res.end(JSON.stringify(json, null, 3));
+    // res.status(200).send(data);
+}
 
 async function checkIngestibility(scoreArray) {
     for (let i = 0; i < 7; i++) {
@@ -357,8 +447,6 @@ async function checkIngestibility(scoreArray) {
 } // check if ingestion criteria is met
 
 module.exports = {
-    rate,
-    saveRepo,
     addPackage,
     getPackage,
     deletePackage,
@@ -366,9 +454,30 @@ module.exports = {
     updatePackage,
     deletePackageByName,
     getHistoryByName,
+    rateUserRepo,
 };
 
 /* *******************************************
                 HOW TO USE:
 ----------------see test.js-------------------
 ******************************************* */
+
+// async function rate(moduleURL) {
+//     const fs = require("fs");
+//     const exec = require("child_process").execSync;
+//     exec("touch ./rating/url.txt");
+//     exec(`echo ${moduleURL} >> ./rating/url.txt`);
+//     console.log("rating");
+//     exec(
+//         "rating/env/bin/python3.8 rating/main.py rating/url.txt >> rating/result.txt"
+//     );
+
+//     var content = fs.readFileSync("rating/result.txt", "utf8");
+//     exec("rm rating/url.txt");
+//     exec("rm rating/result.txt");
+//     console.log("rated");
+//     content = content.split(" ");
+//     content[6] = content[6].slice(0, -1);
+
+//     return content;
+// } // rates the module and returns the result as an array of 7 values

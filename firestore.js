@@ -1,7 +1,7 @@
 const config = require("./config");
-const path = require("path");
+const fs = require("fs");
 const { generateKey, encodeVersion, decodeVersion } = require("./helper");
-const https = require("https");
+
 const { createReadStream } = require("fs");
 
 const USERCOLL = config.USER_KEY;
@@ -61,7 +61,6 @@ class FirestoreClient {
             console.log("error getting files");
             return;
         }
-        // console.log(files);
         const packageFiles = files.filter((f) =>
             f.metadata.id.includes(`/${config.PACKAGE_KEY}/`)
         );
@@ -241,6 +240,9 @@ class Database {
 
     async getUser(name) {
         const response = await this.fs.get(`${USERCOLL}/${name}`);
+        if (!response) {
+            return null;
+        }
         return response.data();
     }
 
@@ -268,42 +270,34 @@ class Database {
         await this.fs.remove(`${AUTHCOLL}/${token}`);
     }
 
-    async uploadPackagePublic(downloadUrl, metadata) {
+    async uploadPackage(packagePath, metadata) {
         const writeStream = await this.fs.getWriteStream(
             `${config.PACKAGE_KEY}/${metadata.ID}`
         );
 
-        const response = https.get(downloadUrl, function (response) {
-            if (!response || response.statusCode !== 200) {
-                return false;
-            }
-            response.pipe(writeStream);
+        const readstream = fs.createReadStream(packagePath);
+        const stream = readstream.pipe(writeStream);
+
+        return await new Promise((resolve, reject) => {
+            stream.on("finish", () => {
+                resolve(true);
+            });
+            stream.on("error", function () {
+                resolve(false);
+            });
         });
-
-        return true;
     }
 
-    async uploadToTemp(contentBuf) {
-        const writeStream = await this.fs.getWriteStream(
-            `${config.TMP_FOLDER}`
-        );
+    // async uploadPackageLocal(contentBuf, metadata) {
+    //     const writeStream = await this.fs.getWriteStream(
+    //         `${config.PACKAGE_KEY}/${metadata.ID}`
+    //     );
 
-        writeStream.write(contentBuf);
-        writeStream.end();
+    //     writeStream.write(contentBuf);
+    //     writeStream.end();
 
-        return true;
-    }
-
-    async uploadPackageLocal(contentBuf, metadata) {
-        const writeStream = await this.fs.getWriteStream(
-            `${config.PACKAGE_KEY}/${metadata.ID}`
-        );
-
-        writeStream.write(contentBuf);
-        writeStream.end();
-
-        return true;
-    }
+    //     return true;
+    // }
 
     async savePackageMetadata(metadata) {
         await this.fs.save(`${PACKAGECOLL}/${metadata.ID}`, metadata);
@@ -425,7 +419,7 @@ class Database {
 
     async getPackageMetadata(id) {
         const metadata = await this.fs.get(`${PACKAGECOLL}/${id}`);
-        return metadata.data();
+        return metadata ? metadata.data() : null;
     }
 
     async checkPackage(id) {
@@ -444,7 +438,7 @@ class Database {
     async saveHistoryLog(authKey, metadata, action) {
         const logObj = { Action: action, Date: Date.now() };
 
-        const auth = await this.getAuth(authKey);
+        const auth = await this.getAuth(authKey.split("bearer ")[1]);
         logObj["User"] = { name: auth.username, isAdmin: auth.isAdmin };
         logObj["PackageMetadata"] = metadata;
 
