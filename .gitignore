@@ -4,6 +4,7 @@ temp/
 /node_modules
 /trial
 base64.js
+tmp/
 
 
 node_modules/.bin/acorn

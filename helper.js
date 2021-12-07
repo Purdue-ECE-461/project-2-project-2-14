@@ -57,35 +57,59 @@ function encodeVersion(versionStr) {
 }
 
 async function emptyTmp() {
-    const directory = "tmp";
+    const directory = config.TMP_FOLDER;
 
     return new Promise((resolve, reject) => {
-        fs.readdir(directory, (err, files) => {
-            if (err) throw err;
-
-            for (const file of files) {
-                fs.unlink(path.join(directory, file), (err) => {
-                    resolve(false);
-                });
+        fs.rm(directory, { recursive: true }, (err) => {
+            if (err) {
+                resolve(false);
+                return;
+            }
+            fs.mkdir(directory, () => {
                 resolve(true);
+            });
+        });
+    });
+}
+
+async function checkZip(path) {
+    return new Promise((resolve, reject) => {
+        spawn("zip", ["-T", path]).on("exit", (code) => {
+            if (code === 0) {
+                resolve(true);
+            } else {
+                resolve(false);
             }
         });
     });
 }
 
 async function unzipTmp() {
-    const code = await new Promise((resolve, reject) => {
+    if (!(await checkZip(`${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`))) {
+        return null;
+    }
+    const success = await new Promise((resolve, reject) => {
         spawn("unzip", [
             "-o",
             `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`,
             "-d",
             `${config.TMP_FOLDER}/`,
-        ]).on("exit", function (code) {
-            resolve(code);
-        });
+        ])
+            .on("exit", function (code) {
+                resolve(true);
+            })
+            .on("error", () => {
+                resolve(false);
+            });
     });
+    if (!success) {
+        return null;
+    }
 
     const packageDir = await getTmpPackageDir();
+    if (packageDir === null) {
+        return null;
+    }
 
     return `${config.TMP_FOLDER}/${packageDir}`;
 }
@@ -108,6 +132,7 @@ async function getTmpPackageDir() {
                 resolve(file);
                 break;
             }
+            resolve(null);
         });
     });
 }

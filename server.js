@@ -6,6 +6,7 @@ const express = require("express");
 const checkAuth = require("./checkAuth");
 const APIusers = require("./APIusers");
 const APIpackages = require("./APIpackages");
+const { emptyTmp } = require("./helper");
 
 // create the express app
 const app = express();
@@ -153,7 +154,8 @@ app.delete("/reset", async (req, res) => {
 });
 
 console.log("Starting up...");
-function startup(flag) {
+async function startup(flag) {
+    await emptyTmp();
     if (flag) {
         reset().then(() => {
             app.listen(process.env.PORT || 3000, () =>
