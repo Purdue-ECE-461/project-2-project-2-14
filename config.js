@@ -1,3 +1,4 @@
+// file to keep all the global variables used by the server
 module.exports = {
     BUCKET_NAME: "ece461project2-333702.appspot.com",
     USER_KEY: "users",
@@ -18,4 +19,6 @@ module.exports = {
     LICENSE_SCORE: "LicenseScore",
     GOOD_PINNING_SCORE: "GoodPinningPractice",
     MIN_SCORE: 0.5,
+    MAX_REQUESTS_PER_TOKEN: 1000,
+    TOKEN_TTL: 10 * 60 * 60 * 1000,
 };

@@ -86,7 +86,7 @@ app.delete("/package/:id", (req, res) => {
 
 app.get("/package/:id/rate", (req, res) => {
     try {
-        APIpackages.rateUserRepo(req, res);
+        APIpackages.packageRate(req, res);
     } catch (e) {
         res.status(500).send();
         console.log(e);

@@ -288,25 +288,33 @@ async function upload(packageUrl, content, metadata) {
 
 // save the contents of the content buffer in the database
 async function addZip(contentBuf, metadata) {
+    // write to temp folder
     fs.writeFileSync(
         `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`,
         contentBuf
     );
 
+    // unzip in tmp folder
     const unzipPath = await unzipTmp();
     if (!unzipPath) {
         return { error: "incorrect zip data" };
     }
 
+    // get repo url out of package.json file
     const url = getUrlFromPackageFiles(unzipPath);
     if (url === null) {
         return { error: "could not find or read package.json" };
     }
     metadata.url = url;
 
+    // rate and check if required score was met
     const rating = await rate(url, unzipPath);
+    if (!checkRating(rating)) {
+        return { error: "package did not have the needed score" };
+    }
     metadata.rating = rating;
 
+    // upload to cloud storage
     let success = await db.uploadPackage(
         `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`,
         metadata
@@ -342,40 +350,39 @@ async function addRepo(url, metadata) {
     const downloadUrl = `https://codeload.github.com/${owner}/${name}/zip/heads/${defaultBranch}`;
 
     let success = await new Promise((resolve, reject) => {
+        // download zip of package and store it in tmp
         https.get(downloadUrl, function (response) {
             if (!response || response.statusCode !== 200) {
                 return false;
             }
-            const stream = response.pipe(
-                fs.createWriteStream(
-                    `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`
+            response
+                .pipe(
+                    fs.createWriteStream(
+                        `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`
+                    )
                 )
-            );
-
-            stream.on("finish", () => {
-                resolve(true);
-            });
-
-            stream.on("error", () => {
-                resolve(false);
-            });
+                .on("finish", () => {
+                    resolve(true);
+                })
+                .on("error", () => {
+                    resolve(false);
+                });
         });
     });
     if (!success) {
         return null;
     }
 
+    // unzip the package in tmp folder
     const unzipPath = await unzipTmp();
     if (!unzipPath) {
         return null;
     }
 
     const rating = await rate(url, unzipPath);
-    if (!checkRating(rating)) {
-        return { error: "package did not have the needed score" };
-    }
     metadata.rating = rating;
 
+    //upload to google cloud storage
     success = await db.uploadPackage(
         `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`,
         metadata
@@ -387,6 +394,7 @@ async function addRepo(url, metadata) {
     return metadata;
 }
 
+// check if the score matches the requirement
 function checkRating(rating) {
     if (!rating) {
         return false;
@@ -419,35 +427,35 @@ async function rate(url, packagePath) {
     });
 }
 
-async function rateUserRepo(req, res) {
-    let url = `https://github.com/${req.params.user}/${req.params.repo}`;
-    console.log(url);
-    const exec = require("child_process").execSync;
-    data = exec(
-        `./rating/env/bin/python3.8 -B ./rating/main.py ${url}`
-    ).toString();
-    data = data.split(" ");
-    data[6] = data[6].slice(0, -1);
-    console.log(data);
-    let json = {
-        RampUp: Number(data[1]),
-        Correctness: Number(data[2]),
-        BusFactor: Number(data[3]),
-        ResponsiveMaintainer: Number(data[4]),
-        LicenseScore: Number(data[5]),
-        GoodPinningPractice: Number(data[6]),
-    };
-    res.status(200);
-    res.end(JSON.stringify(json, null, 3));
-    // res.status(200).send(data);
-}
-
-async function checkIngestibility(scoreArray) {
-    for (let i = 0; i < 7; i++) {
-        if (scoreArray[i] < 0.5) return false;
+// endpoint that returns the package score
+async function packageRate(req, res) {
+    if (!(await checkAuth(req.headers, false))) {
+        res.status(401).send();
+        return;
     }
-    return true;
-} // check if ingestion criteria is met
+
+    // input validation
+    const id = req.params?.id;
+    if (id === undefined) {
+        res.status(400).send("ID not defined");
+        return;
+    }
+
+    // get the metadata from firestore and validate
+    const metadata = await db.getPackageMetadata(id);
+    if (metadata === null) {
+        res.status(404).send("Package does not exist");
+        return;
+    }
+    if (metadata.rating === undefined) {
+        res.status(500).send("package cannot be rated");
+        return;
+    }
+
+    // send the rating back to the user
+    res.status(200).json(metadata.rating);
+    db.saveHistoryLog(req.headers["x-authorization"], metadata, "RATE");
+}
 
 module.exports = {
     addPackage,
@@ -457,30 +465,5 @@ module.exports = {
     updatePackage,
     deletePackageByName,
     getHistoryByName,
-    rateUserRepo,
+    packageRate,
 };
-
-/* *******************************************
-                HOW TO USE:
-----------------see test.js-------------------
-******************************************* */
-
-// async function rate(moduleURL) {
-//     const fs = require("fs");
-//     const exec = require("child_process").execSync;
-//     exec("touch ./rating/url.txt");
-//     exec(`echo ${moduleURL} >> ./rating/url.txt`);
-//     console.log("rating");
-//     exec(
-//         "rating/env/bin/python3.8 rating/main.py rating/url.txt >> rating/result.txt"
-//     );
-
-//     var content = fs.readFileSync("rating/result.txt", "utf8");
-//     exec("rm rating/url.txt");
-//     exec("rm rating/result.txt");
-//     console.log("rated");
-//     content = content.split(" ");
-//     content[6] = content[6].slice(0, -1);
-
-//     return content;
-// } // rates the module and returns the result as an array of 7 values

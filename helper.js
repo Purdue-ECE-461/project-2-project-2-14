@@ -6,14 +6,17 @@ const spawn = require("child_process").spawn;
 
 const TOKEN_BYTES = config.TOKEN_BYTES;
 
+// creates and returns a md5 hash from an input string
 function generateHash(string) {
     return crypto.createHash("md5").update(string).digest("hex");
 }
 
+// generates a random key of len bytes
 function generateKey(len) {
     return crypto.randomBytes(len).toString("hex");
 }
 
+// waites for ms milliseconds before resolving
 async function __waitFor(ms) {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
@@ -36,16 +39,7 @@ function checkMetadata(oldData, newData) {
     );
 }
 
-function decodeVersion(versionNum) {
-    const major = Math.floor(versionNum / 1000000000);
-    versionNum = versionNum % 1000000000;
-    const minor = Math.floor(versionNum / 100000);
-    versionNum = versionNum % 100000;
-    const patch = Math.floor(versionNum);
-
-    return `${major}.${minor}.${patch}`;
-}
-
+// encodes the version string in a number for easy comparison
 function encodeVersion(versionStr) {
     let vArr = versionStr.split(".");
     let out = 0;
@@ -56,6 +50,18 @@ function encodeVersion(versionStr) {
     return out;
 }
 
+// decodes the version number back to the version string
+function decodeVersion(versionNum) {
+    const major = Math.floor(versionNum / 1000000000);
+    versionNum = versionNum % 1000000000;
+    const minor = Math.floor(versionNum / 100000);
+    versionNum = versionNum % 100000;
+    const patch = Math.floor(versionNum);
+
+    return `${major}.${minor}.${patch}`;
+}
+
+// emptys the tmp folder
 async function emptyTmp() {
     const directory = config.TMP_FOLDER;
 
@@ -72,6 +78,7 @@ async function emptyTmp() {
     });
 }
 
+// checks if zip file is in the right format
 async function checkZip(path) {
     return new Promise((resolve, reject) => {
         spawn("zip", ["-T", path]).on("exit", (code) => {
@@ -84,6 +91,7 @@ async function checkZip(path) {
     });
 }
 
+// unzips the tmp.zip file in the tmp folder and places it contents in the tmp/ folder
 async function unzipTmp() {
     if (!(await checkZip(`${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`))) {
         return null;
@@ -114,6 +122,7 @@ async function unzipTmp() {
     return `${config.TMP_FOLDER}/${packageDir}`;
 }
 
+// gets the unzipped package directory by looking through the tmp folder
 async function getTmpPackageDir() {
     return new Promise((resolve, reject) => {
         fs.readdir(`${config.TMP_FOLDER}/`, (err, files) => {
@@ -137,6 +146,7 @@ async function getTmpPackageDir() {
     });
 }
 
+// get the url from package files by accessing the package.json file
 function getUrlFromPackageFiles(packagePath) {
     const packageJsonFile = `${packagePath}/package.json`;
     let packageJSON = null;

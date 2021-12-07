@@ -12,6 +12,7 @@ const AUTHCOLL = config.AUTH_KEY;
 const DELETE_COLLECTION_BATCH = config.DELETE_COLLECTION_BATCH;
 
 class FirestoreClient {
+    // uses the key file to authorize app to use firestore and cloud bucket
     constructor() {
         this.admin = require("firebase-admin");
 
@@ -24,6 +25,7 @@ class FirestoreClient {
         this.bucket = this.admin.storage().bucket();
     }
 
+    // ----------------- CLOUD BUCKET FUNCTIONS ---------------------x
     async fileExists(path) {
         return await this.bucket.file(path).exists();
     }
@@ -68,6 +70,8 @@ class FirestoreClient {
             await f.delete();
         });
     }
+    // ----------------- CLOUD BUCKET FUNCTIONS ---------------------x
+    // ------------------- FIRESTORE FUNCTIONS ----------------------x
 
     async exists(path) {
         const doc = await this.firestore.doc(path).get();
@@ -112,6 +116,7 @@ class FirestoreClient {
         return out;
     }
 
+    // runs the queries given in the query arr and returns paginated list
     async runBatchQuery(colPath, queryArr, pageOffset) {
         const colRef = this.firestore.collection(colPath);
         const out = [];
@@ -119,7 +124,9 @@ class FirestoreClient {
         let index = 0;
         const offset = pageOffset * config.OFFSET_SIZE;
 
+        // loops through the conditions for every query and queries firestore
         for (const conditions of queryArr) {
+            // iterating through all the conditions and creating a query
             let ref = colRef;
             conditions.forEach((c) => {
                 ref = ref.where(c.key, c.oper, c.value);
@@ -127,12 +134,16 @@ class FirestoreClient {
 
             const snapshot = await ref.get();
 
+            // adding the results to an array of size OFFSET_SIZE defined in config.js
+            // skips the first 'offset' number of results
             try {
                 snapshot.forEach((p) => {
                     if (index < offset) {
                         index++;
                         return;
                     }
+
+                    // throws an error when enough data is retrieved to exit out of the forEach loop
                     if (index >= offset + config.OFFSET_SIZE) {
                         throw "break";
                     }
@@ -205,8 +216,10 @@ class FirestoreClient {
             this.deleteQueryBatch(query, resolve);
         });
     }
+    // ------------------- FIRESTORE FUNCTIONS ----------------------x
 }
 
+// wrapper class for the FirestoreClient class
 class Database {
     constructor() {
         this.fs = new FirestoreClient();
@@ -257,6 +270,8 @@ class Database {
         await this.fs.save(`${AUTHCOLL}/${token}`, auth);
     }
 
+    // gets the auth token info from the database and increments the number of request
+    // made using this token, if there is a match.
     async getAuth(token) {
         const auth = await this.fs.get(`${AUTHCOLL}/${token}`);
         if (auth !== null) {
@@ -270,6 +285,7 @@ class Database {
         await this.fs.remove(`${AUTHCOLL}/${token}`);
     }
 
+    // uploads the packae in cloud buckets
     async uploadPackage(packagePath, metadata) {
         const writeStream = await this.fs.getWriteStream(
             `${config.PACKAGE_KEY}/${metadata.ID}`
@@ -288,21 +304,12 @@ class Database {
         });
     }
 
-    // async uploadPackageLocal(contentBuf, metadata) {
-    //     const writeStream = await this.fs.getWriteStream(
-    //         `${config.PACKAGE_KEY}/${metadata.ID}`
-    //     );
-
-    //     writeStream.write(contentBuf);
-    //     writeStream.end();
-
-    //     return true;
-    // }
-
+    // saves the package metadata in firestore
     async savePackageMetadata(metadata) {
         await this.fs.save(`${PACKAGECOLL}/${metadata.ID}`, metadata);
     }
 
+    // returns paginated array of all packages in alphabetical order
     async getAllPackagesMetadata(offset) {
         const packages = await this.fs.getAllFromCollection(
             `${config.PACKAGE_KEY}`,
@@ -315,6 +322,7 @@ class Database {
         return out;
     }
 
+    // searches packages pased on the in input queries
     async searchPackagesMetadata(queryArr, offset) {
         const fsQueries = this.parseQueries(queryArr);
 
@@ -332,12 +340,24 @@ class Database {
         return out;
     }
 
+    // parses the queries from the user input format to a format that can be
+    // used by FirestoreClient.runBatchQuery
+    // returns an array of array of condition objects
+    // a condition object represents one condition and is in the form:
+    // conditionObject : {
+    //     key: the name of the field to compare in the firestore database
+    //     oper: the operation to compare the two values
+    //     value: the value to compare it the field to
+    // }
+    // an array of these objects create a single query
     parseQueries(queryArr) {
         const fsQueries = [];
 
         for (let i = 0; i < queryArr.length; i++) {
             const q = queryArr[i];
             const conditions = [];
+
+            // name is a required input so create the condition first
             let fsq = {
                 key: "Name",
                 oper: "==",
@@ -345,8 +365,10 @@ class Database {
             };
             conditions.push(fsq);
 
+            // if there are version based conditions add them to the array
             if (q.Version) {
                 try {
+                    // creates a range query if there is a "-" in the input query
                     if (q.Version.includes("-")) {
                         let versions = q.Version.split("-");
                         fsq = {
@@ -362,7 +384,9 @@ class Database {
                             value: encodeVersion(versions[1]),
                         };
                         conditions.push(fsq);
-                    } else if (q.Version.includes("^")) {
+                    }
+                    // creates a major version locked query if there is a "^" in the input query
+                    else if (q.Version.includes("^")) {
                         let major = parseInt(
                             q.Version.split("^")[1].split(".")[0]
                         );
@@ -379,7 +403,9 @@ class Database {
                             value: encodeVersion(`${major + 1}.0.0`),
                         };
                         conditions.push(fsq);
-                    } else if (q.Version.includes("~")) {
+                    }
+                    // creates a minor and major version locked query if there is a "~" in the input query
+                    else if (q.Version.includes("~")) {
                         let major = parseInt(
                             q.Version.split("^")[1].split(".")[0]
                         );
@@ -399,7 +425,9 @@ class Database {
                             value: encodeVersion(`${major}.${minor + 1}.0`),
                         };
                         conditions.push(fsq);
-                    } else {
+                    }
+                    // creates a simple equalto query if none of the characters are present
+                    else {
                         fsq = {
                             key: "Version",
                             oper: "==",

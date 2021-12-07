@@ -3,15 +3,17 @@ const checkAuth = require("./checkAuth");
 const helper = require("./helper");
 const db = require("./firestore");
 
+// handler for the authenticate endpoint
 async function authenticate(req, res) {
+    // input validation
     const user = req.body.User;
     const secret = req.body.Secret;
-
     if (!user || !user.name || !secret || !secret.password) {
         res.status(400).send("Incorrect inputs");
         return;
     }
 
+    // create the password hash and compare it the hash stored in the database
     const password = secret.password;
     const passwordHash = helper.generateHash(password); // TODO: add salt to hash
 
@@ -25,6 +27,7 @@ async function authenticate(req, res) {
         db.removeAuth(userData.authToken);
     }
 
+    // generate the token and send it back to user and save it in the database
     const token = helper.generateKey(config.TOKEN_BYTES);
     userData.authToken = token;
     db.updateUser(user.name, userData);
@@ -34,6 +37,7 @@ async function authenticate(req, res) {
     res.status(200).send(token);
 }
 
+// handler for the create new user endpoint
 async function createNewUser(req, res) {
     if (!(await checkAuth(req.headers, true))) {
         res.status(401).send();
@@ -58,6 +62,7 @@ async function createNewUser(req, res) {
     res.status(200).send();
 }
 
+// handler for the delete user endpoint
 async function deleteUser(req, res) {
     if (!(await checkAuth(req.headers, true))) {
         res.status(401).send();
