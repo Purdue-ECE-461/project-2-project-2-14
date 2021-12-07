@@ -30,12 +30,13 @@ class Logger {
         }
     }
 
-    async flush() {
+    flush() {
         // write logs to database
-        await db.writeLogFile(`${Date.now().toString()}.log`, this.buffer);
-
+        const bufferCpy = [...this.buffer];
         this.buffer = [];
         this.num = 0;
+
+        db.writeLogFile(`${Date.now().toString()}.log`, bufferCpy);
     }
 }
 
