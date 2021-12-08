@@ -20,7 +20,7 @@ const {
     getGithubDefaultBranchName,
 } = require("get-github-default-branch-name");
 const https = require("https");
-const logger = require("./logger");
+const logger = require("./gcloudlog");
 const exec = require("child_process").execSync;
 
 // gets all the packages that match the queries
@@ -313,6 +313,7 @@ async function upload(packageUrl, content, metadata) {
     }
 
     if (!metadata) {
+        removeTmpFolder(uploadID);
         return null;
     }
     // return the metadata with the url of the package saved and delete the folder in tmp
@@ -357,7 +358,11 @@ async function addZip(contentBuf, metadata, uploadID) {
         return { error: "Could not rate module" };
     }
     if (!checkRating(rating)) {
-        return { error: "package did not have the needed score" };
+        return {
+            error:
+                "package did not have the needed score: " +
+                JSON.stringify(rating),
+        };
     }
     metadata.rating = rating;
 
@@ -465,14 +470,18 @@ function checkRating(rating) {
         return false;
     }
     const min = config.MIN_SCORE;
-    return (
-        rating[config.BUS_FACTOR_SCORE] >= min &&
-        rating[config.CORRECTNESS_SCORE] >= min &&
-        rating[config.RAMP_UP_SCORE] >= min &&
-        rating[config.RESPONSIVE_MAINTAINER_SCORE] >= min &&
-        rating[config.LICENSE_SCORE] >= min &&
-        rating[config.GOOD_PINNING_SCORE] >= min
-    );
+    try {
+        return (
+            rating[config.BUS_FACTOR_SCORE] >= min &&
+            rating[config.CORRECTNESS_SCORE] >= min &&
+            rating[config.RAMP_UP_SCORE] >= min &&
+            rating[config.RESPONSIVE_MAINTAINER_SCORE] >= min &&
+            rating[config.LICENSE_SCORE] >= min &&
+            rating[config.GOOD_PINNING_SCORE] >= min
+        );
+    } catch {
+        return false;
+    }
 }
 
 function rate(url, packagePath) {

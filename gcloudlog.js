@@ -1,8 +1,10 @@
-const db = require("./firestore");
+// const db = require("./firestore");
 const config = require("./config");
+const events = require("events");
 
-class Logger {
+class MyLogger {
     constructor() {
+        this.emitter = new events.EventEmitter();
         this.buffer = [];
         this.num = 0;
     }
@@ -35,11 +37,11 @@ class Logger {
         const bufferCpy = [...this.buffer];
         this.buffer = [];
         this.num = 0;
-
-        db.writeLogFile(`${Date.now().toString()}.log`, bufferCpy);
+        this.emitter.emit("LOG", `${Date.now().toString()}.log`, bufferCpy);
+        // db.writeLogFile(`${Date.now().toString()}.log`, bufferCpy);
     }
 }
 
-const instance = new Logger();
+const instance = new MyLogger();
 
 module.exports = instance;

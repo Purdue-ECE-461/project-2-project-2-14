@@ -2,7 +2,7 @@ const config = require("./config");
 const fs = require("fs");
 const { generateKey, encodeVersion, decodeVersion } = require("./helper");
 const Stream = require("stream");
-const logger = require("./logger");
+const logger = require("./gcloudlog");
 
 const USERCOLL = config.USER_KEY;
 const PACKAGECOLL = config.PACKAGE_KEY;
@@ -228,6 +228,9 @@ class FirestoreClient {
 class Database {
     constructor() {
         this.fs = new FirestoreClient();
+        logger.emitter.on("LOG", (filename, data) => {
+            this.writeLogFile(filename, data);
+        });
     }
 
     async deletePackages() {
@@ -528,11 +531,9 @@ class Database {
         );
         const readStream = new Stream.Readable.from(logs);
         readStream.pipe(writeStream);
-
-        console.log("Writing logs");
     }
 }
 const instance = new Database();
-Object.freeze(instance);
+// Object.freeze(instance);
 
 module.exports = instance;

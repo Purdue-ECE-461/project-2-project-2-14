@@ -1,21 +1,16 @@
 const { __waitFor } = require("../helper");
-const { spawn } = require("child_process");
+const { killServer, serverEvents } = require("../server");
 const fetch = require("node-fetch");
 const fs = require("fs");
 
 let adminAuthKey = null;
-let server = null;
 let randomPackageID = null;
 
 describe("API packages test", () => {
     beforeAll(async () => {
         await new Promise((resolve, reject) => {
-            server = spawn("npm", ["start"]);
-            server.stdout.on("data", (data) => {
-                const str = data.toString();
-                if (str === "Server is running on port 3000\n") {
-                    resolve();
-                }
+            serverEvents.on("STARTED", () => {
+                resolve();
             });
         });
         const data = {
@@ -44,7 +39,7 @@ describe("API packages test", () => {
     }, 10000);
 
     afterAll(() => {
-        server.kill();
+        killServer();
     });
 
     beforeEach(async () => {});

@@ -2,7 +2,7 @@ const config = require("./config");
 const checkAuth = require("./checkAuth");
 const helper = require("./helper");
 const db = require("./firestore");
-const logger = require("./logger");
+const logger = require("./gcloudlog");
 
 // handler for the authenticate endpoint
 async function authenticate(req, res) {

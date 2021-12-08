@@ -1,7 +1,7 @@
 require("dotenv").config();
 const reset = require("./reset");
-const logger = require("./logger");
-
+const logger = require("./gcloudlog");
+const events = require("events");
 const express = require("express");
 
 const checkAuth = require("./checkAuth");
@@ -155,23 +155,40 @@ app.delete("/reset", async (req, res) => {
     }
 });
 
+const serverEvents = new events.EventEmitter();
+let server = null;
 console.log("Starting up...");
 async function startup(flag) {
     await emptyTmp();
     if (flag) {
         reset().then(() => {
-            app.listen(process.env.PORT || 3000, () =>
+            server = app.listen(process.env.PORT || 3000, () => {
                 console.log(
                     `Server is running on port ${process.env.PORT || 3000}`
-                )
-            );
+                );
+                serverEvents.emit("STARTED");
+            });
         });
     } else {
-        app.listen(process.env.PORT || 3000, () =>
-            console.log(`Server is running on port ${process.env.PORT || 3000}`)
-        );
+        server = app.listen(process.env.PORT || 3000, () => {
+            console.log(
+                `Server is running on port ${process.env.PORT || 3000}`
+            );
+            serverEvents.emit("STARTED");
+        });
     }
     logger.write("Started server");
 }
 let resetFlag = !process.argv.includes("--nReset");
 startup(resetFlag);
+
+function killServer() {
+    if (server) {
+        server.close();
+    }
+}
+
+module.exports = {
+    killServer: killServer,
+    serverEvents: serverEvents,
+};

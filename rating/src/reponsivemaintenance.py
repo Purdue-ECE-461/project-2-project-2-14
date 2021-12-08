@@ -21,7 +21,7 @@ def responsive(commits):
     # elif LOG_LEVEL == 2: # pragma: no cover
         # LOG_FILE.write("Decoding timestamps from API response\n")
 
-    dateOneMonthAgo = datetime.now().timestamp() - NUM_SECONDS_IN_MONTH
+    dateOneMonthAgo = datetime.now().timestamp() - NUM_SECONDS_IN_MONTH * 2
     dateOneMonthAgo = datetime.fromtimestamp(dateOneMonthAgo)
 
     dateOneWeekAgo = datetime.now().timestamp() - NUM_SECONDS_IN_WEEK
@@ -64,5 +64,5 @@ def responsive(commits):
 
     # if LOG_LEVEL == 2 or LOG_LEVEL == 1:
         # LOG_FILE.write("Assigning scores\n")
-
+    # return 0.5
     return 0.5 * commitFrequencyScore + 0.5 * lastCommitScore
