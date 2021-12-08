@@ -21,6 +21,7 @@ const {
 } = require("get-github-default-branch-name");
 const https = require("https");
 const logger = require("./logger");
+const exec = require("child_process").execSync
 
 // gets all the packages that match the queries
 // paginated with a page size of OFFSET_SIZE in config.js
@@ -347,7 +348,7 @@ async function addZip(contentBuf, metadata, uploadID) {
     metadata.url = url;
 
     // rate and check if required score was met
-    const rating = await rate(url, unzipPath);
+    const rating = rate(url, unzipPath);
     logger.write(
         `Rating package at: ${url} for package with id: ${metadata.ID}`
     );
@@ -430,7 +431,7 @@ async function addRepo(url, metadata, uploadID) {
         `Unzipped package files at tmp for package with id: ${metadata.ID}`
     );
 
-    const rating = await rate(url, unzipPath);
+    const rating = rate(url, unzipPath);
     logger.write(
         `Rating package at: ${url} for package with id: ${metadata.ID}`
     );
@@ -467,21 +468,20 @@ function checkRating(rating) {
     );
 }
 
-async function rate(url, packagePath) {
+function rate(url, packagePath) {
     console.log(url);
     console.log(packagePath);
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve({
-                BusFactor: 1,
-                Correctness: 1,
-                RampUp: 1,
-                ResponsiveMaintainer: 1,
-                LicenseScore: 1,
-                GoodPinningPractice: 1,
-            });
-        }, 1000);
-    });
+    data = exec(`rating2/run ${packagePath} ${url}`).toString
+    data = data.split(" ");
+    data[6] = data[6].slice(0, -1);
+    const rating = {};
+    rating[config.BUS_FACTOR_SCORE] = data[2]
+    rating[config.CORRECTNESS_SCORE] = data[4]
+    rating[config.RAMP_UP_SCORE] = data[1]
+    rating[config.RESPONSIVE_MAINTAINER_SCORE] = data[3]
+    rating[config.LICENSE_SCORE] = data[0]
+    rating[config.GOOD_PINNING_SCORE] = data[5]
+    return rating
 }
 
 // endpoint that returns the package score
