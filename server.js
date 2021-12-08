@@ -122,7 +122,7 @@ app.delete("/package/byName/:name", (req, res) => {
     }
 });
 
-app.get("/packages", (req, res) => {
+app.post("/packages", (req, res) => {
     try {
         APIpackages.getPackages(req, res);
     } catch (e) {
