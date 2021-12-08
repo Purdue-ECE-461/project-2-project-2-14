@@ -7,7 +7,7 @@ let adminAuthKey = null;
 let server = null;
 let randomPackageID = null;
 
-describe("API users test", () => {
+describe("API packages test", () => {
     beforeAll(async () => {
         await new Promise((resolve, reject) => {
             server = spawn("npm", ["start"]);
