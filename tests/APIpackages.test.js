@@ -9,15 +9,15 @@ let randomPackageID = null;
 
 describe("API users test", () => {
     beforeAll(async () => {
-        // await new Promise((resolve, reject) => {
-        //     server = spawn("npm", ["start"]);
-        //     server.stdout.on("data", (data) => {
-        //         const str = data.toString();
-        //         if (str === "Server is running on port 3000\n") {
-        //             resolve();
-        //         }
-        //     });
-        // });
+        await new Promise((resolve, reject) => {
+            server = spawn("npm", ["start"]);
+            server.stdout.on("data", (data) => {
+                const str = data.toString();
+                if (str === "Server is running on port 3000\n") {
+                    resolve();
+                }
+            });
+        });
         const data = {
             User: {
                 name: "admin",
@@ -44,7 +44,7 @@ describe("API users test", () => {
     }, 10000);
 
     afterAll(() => {
-        // server.kill();
+        server.kill();
     });
 
     beforeEach(async () => {});
@@ -309,6 +309,21 @@ describe("API users test", () => {
         );
         const responseData = await response.json();
         expect(responseData.length).toBe(0);
+    });
+
+    test("download package without auth key", async () => {
+        const options = {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        };
+
+        const response = await fetch(
+            `http://localhost:3000/package/${randomPackageID}`,
+            options
+        );
+        expect(response.status).toBe(401);
     });
 
     delete test("delete by id", async () => {
