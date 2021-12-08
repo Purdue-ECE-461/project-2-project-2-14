@@ -173,4 +173,5 @@ async function startup(flag) {
     }
     logger.write("Started server");
 }
-startup(true);
+let resetFlag = !process.argv.includes("--nReset");
+startup(resetFlag);

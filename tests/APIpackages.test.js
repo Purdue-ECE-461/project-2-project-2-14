@@ -24,13 +24,13 @@ describe("API users test", () => {
 
     afterEach(async () => {});
 
-    test("getting admin auth key", async () => {
-        console.log(1);
-        const req = new Req(null, null, ADMIN_LOGIN, null);
-        const res = new Res();
+    // test("getting admin auth key", async () => {
+    //     console.log(1);
+    //     const req = new Req(null, null, ADMIN_LOGIN, null);
+    //     const res = new Res();
 
-        await APIusers.authenticate(req, res);
-        adminAuthKey = res._response;
-        expect(res._status).toBe(200);
-    });
+    //     await APIusers.authenticate(req, res);
+    //     adminAuthKey = res._response;
+    //     expect(res._status).toBe(200);
+    // });
 });

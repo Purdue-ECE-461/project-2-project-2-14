@@ -26,7 +26,6 @@ describe("API users test", () => {
     afterEach(async () => {});
 
     test("getting admin auth key", async () => {
-        console.log(1);
         const req = new Req(null, null, ADMIN_LOGIN, null);
         const res = new Res();
 
@@ -36,7 +35,6 @@ describe("API users test", () => {
     });
 
     test("getting admin auth key with wrong credentials", async () => {
-        console.log(2);
         const req = new Req(
             null,
             null,
@@ -50,7 +48,6 @@ describe("API users test", () => {
     });
 
     test("create new user", async () => {
-        console.log(3);
         const req = new Req(
             null,
             null,
@@ -68,7 +65,6 @@ describe("API users test", () => {
     });
 
     test("create new user. incorrect inputs", async () => {
-        console.log(4);
         const req = new Req(
             null,
             null,
@@ -84,7 +80,6 @@ describe("API users test", () => {
     });
 
     test("delete user", async () => {
-        console.log(5);
         const req = new Req(
             null,
             null,
