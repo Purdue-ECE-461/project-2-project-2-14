@@ -1,6 +1,8 @@
 # Trustworthy Module Registry
-  const creators = [`Sidd Mitra`, `Devansh Rathi`, `Charles Gao`];
+
+	const creators = [`Sidd Mitra`, `Devansh Rathi`, `Charles Gao`];
   
-See apiSpec.json for information about our projects.
+>See **TrustworthyModuleRegistry_Team14.yaml** for information about our projects.
+
 
 
