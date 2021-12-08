@@ -2,6 +2,7 @@ const config = require("./config");
 const fs = require("fs");
 const { generateKey, encodeVersion, decodeVersion } = require("./helper");
 const Stream = require("stream");
+const logger = require("./logger");
 
 const USERCOLL = config.USER_KEY;
 const PACKAGECOLL = config.PACKAGE_KEY;
@@ -22,6 +23,7 @@ class FirestoreClient {
         });
         this.firestore = this.admin.firestore();
         this.bucket = this.admin.storage().bucket();
+        logger.write(`Got access for firebase`);
     }
 
     // ----------------- CLOUD BUCKET FUNCTIONS ---------------------x
@@ -30,10 +32,12 @@ class FirestoreClient {
     }
 
     async getWriteStream(destination) {
+        logger.write(`Trying to get write stream at ${destination}...`);
         return this.bucket.file(destination).createWriteStream();
     }
 
     async getReadStream(path) {
+        logger.write(`Trying to get read stream at ${destination}...`);
         const [exists] = await this.fileExists(path);
         if (exists) {
             return this.bucket.file(path).createReadStream();
@@ -42,6 +46,7 @@ class FirestoreClient {
     }
 
     async deletePackage(path) {
+        logger.write(`Trying to delete ${destination}...`);
         const [exists] = await this.fileExists(path);
         if (exists) {
             await this.bucket.file(path).delete();
@@ -51,6 +56,7 @@ class FirestoreClient {
     }
 
     async emptyBucket() {
+        logger.write(`Trying to empty bucket...`);
         let files;
         try {
             files = await this.bucket.getFiles();

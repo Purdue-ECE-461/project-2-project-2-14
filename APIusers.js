@@ -2,6 +2,7 @@ const config = require("./config");
 const checkAuth = require("./checkAuth");
 const helper = require("./helper");
 const db = require("./firestore");
+const logger = require("./logger");
 
 // handler for the authenticate endpoint
 async function authenticate(req, res) {
@@ -35,6 +36,7 @@ async function authenticate(req, res) {
     db.saveAuth(token, user.name, user.isAdmin);
 
     res.status(200).send(token);
+    logger.write(`Authorized user: ${user.name}`);
 }
 
 // handler for the create new user endpoint
@@ -66,6 +68,7 @@ async function createNewUser(req, res) {
     await db.saveUser(username, helper.generateHash(password), isAdmin);
 
     res.status(200).send();
+    logger.write(`Created new user: ${username}`);
 }
 
 // handler for the delete user endpoint
@@ -89,6 +92,7 @@ async function deleteUser(req, res) {
     await db.deleteUser(username);
 
     res.status(200).send();
+    logger.write(`Deleted user: ${username}`);
 }
 
 module.exports = {

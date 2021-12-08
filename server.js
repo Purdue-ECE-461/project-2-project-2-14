@@ -147,6 +147,7 @@ app.delete("/reset", async (req, res) => {
             return;
         }
         reset();
+        logger.write("Resetted server");
         res.status(200).send();
     } catch (e) {
         res.status(500).send();
@@ -154,7 +155,6 @@ app.delete("/reset", async (req, res) => {
     }
 });
 
-let index = 0;
 console.log("Starting up...");
 async function startup(flag) {
     await emptyTmp();
@@ -171,5 +171,6 @@ async function startup(flag) {
             console.log(`Server is running on port ${process.env.PORT || 3000}`)
         );
     }
+    logger.write("Started server");
 }
 startup(true);

@@ -17,6 +17,7 @@ const {
     getGithubDefaultBranchName,
 } = require("get-github-default-branch-name");
 const https = require("https");
+const logger = require("./logger");
 
 // gets all the packages that match the queries
 // paginated with a page size of OFFSET_SIZE in config.js
@@ -49,6 +50,9 @@ async function getPackages(req, res) {
     res.setHeader("offset", offset);
     const packages = await db.searchPackagesMetadata(queryArr, offset);
     res.status(200).json(packages);
+    logger.write(
+        `Responded to query with ${packages.length} results with offset: ${offset}`
+    );
 }
 
 // gets the history of the package in the request parameters
@@ -69,6 +73,10 @@ async function getHistoryByName(req, res) {
     // get and send the response to the user
     const logs = await db.getHistoryByName(name);
     res.status(200).json(logs);
+
+    logger.write(
+        `Responded with history of package ${name} with ${logs.length} number of items`
+    );
 }
 
 // deletes all the packages with the name given in request parameters
@@ -92,6 +100,7 @@ async function deletePackageByName(req, res) {
         return;
     }
     res.status(200).send();
+    logger.write(`Deleted all packages with name: ${name}`);
 }
 
 // deletes the package with the id given in request parameters
@@ -115,6 +124,7 @@ async function deletePackage(req, res) {
         return;
     }
     res.status(200).send();
+    logger.write(`Deleted package with id: ${id}`);
 }
 
 // responds with the zip file of the package with the ID
@@ -149,6 +159,7 @@ async function getPackage(req, res) {
     db.getPackageMetadata(id).then((metadata) => {
         db.saveHistoryLog(req.headers["x-authorization"], metadata, "DOWNLOAD");
     });
+    logger.write(`Sent package zip with id: ${id}`);
 }
 
 // adds the package and the metadata to the database
@@ -198,11 +209,19 @@ async function addPackage(req, res) {
 
     // encode the version string to a format that is easier to compare
     // for database queries, before saving it
+    const versionStr = metadata.Version;
     metadata.Version = encodeVersion(metadata.Version);
     db.savePackageMetadata(metadata);
 
     // save the log of the action
     db.saveHistoryLog(req.headers["x-authorization"], metadata, "CREATE");
+    logger.write(
+        `Added package: ${JSON.stringify({
+            ID: metadata.ID,
+            Name: metadata.Name,
+            Version: versionStr,
+        })}`
+    );
 }
 
 // updates the package that matches the metadata object of the request body,
@@ -263,6 +282,13 @@ async function updatePackage(req, res) {
     // decode the version string before sending it back
     metadata.Version = decodeVersion(metadata.Version);
     res.status(200).json(metadata);
+    logger.write(
+        `Updated package: ${JSON.stringify({
+            ID: metadata.ID,
+            Name: metadata.Name,
+            Version: metadata.Version,
+        })}`
+    );
 }
 
 // uploads a zip to the database based on the packageUrl and content parameters
@@ -283,6 +309,7 @@ async function upload(packageUrl, content, metadata) {
     }
     // return the metadata with the url of the package saved and empty the tmp folder
     emptyTmp();
+    logger.write(`Emptied the tmp folder`);
     return metadata;
 }
 
@@ -293,12 +320,18 @@ async function addZip(contentBuf, metadata) {
         `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`,
         contentBuf
     );
+    logger.write(
+        `Wrote package files to tmp for package with id: ${metadata.ID}`
+    );
 
     // unzip in tmp folder
     const unzipPath = await unzipTmp();
     if (!unzipPath) {
         return { error: "incorrect zip data" };
     }
+    logger.write(
+        `Unzipped package files at tmp for package with id: ${metadata.ID}`
+    );
 
     // get repo url out of package.json file
     const url = getUrlFromPackageFiles(unzipPath);
@@ -309,6 +342,9 @@ async function addZip(contentBuf, metadata) {
 
     // rate and check if required score was met
     const rating = await rate(url, unzipPath);
+    logger.write(
+        `Rating package at: ${url} for package with id: ${metadata.ID}`
+    );
     if (!checkRating(rating)) {
         return { error: "package did not have the needed score" };
     }
@@ -322,6 +358,9 @@ async function addZip(contentBuf, metadata) {
     if (!success) {
         return null;
     }
+    logger.write(
+        `Uploaded package zip to cloud bucket for package with id: ${metadata.ID}`
+    );
     return metadata;
 }
 
@@ -372,14 +411,23 @@ async function addRepo(url, metadata) {
     if (!success) {
         return null;
     }
+    logger.write(
+        `Downloaded and stored package from: ${downloadUrl} to tmp for package with id: ${metadata.ID}`
+    );
 
     // unzip the package in tmp folder
     const unzipPath = await unzipTmp();
     if (!unzipPath) {
         return null;
     }
+    logger.write(
+        `Unzipped package files at tmp for package with id: ${metadata.ID}`
+    );
 
     const rating = await rate(url, unzipPath);
+    logger.write(
+        `Rating package at: ${url} for package with id: ${metadata.ID}`
+    );
     metadata.rating = rating;
 
     //upload to google cloud storage
@@ -390,6 +438,9 @@ async function addRepo(url, metadata) {
     if (!success) {
         return null;
     }
+    logger.write(
+        `Uploaded package zip to cloud bucket for package with id: ${metadata.ID}`
+    );
 
     return metadata;
 }
@@ -455,6 +506,7 @@ async function packageRate(req, res) {
     // send the rating back to the user
     res.status(200).json(metadata.rating);
     db.saveHistoryLog(req.headers["x-authorization"], metadata, "RATE");
+    logger.write(`Returned the rating of the package with id: ${id}`);
 }
 
 module.exports = {
