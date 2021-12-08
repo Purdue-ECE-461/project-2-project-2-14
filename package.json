@@ -33,6 +33,7 @@
     "devDependencies": {
         "eslint": "^8.2.0",
         "firestore-jest-mock": "^0.17.0",
-        "jest": "^27.3.1"
+        "jest": "^27.3.1",
+        "node-fetch": "2.0"
     }
 }
