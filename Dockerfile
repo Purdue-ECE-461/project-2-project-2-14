@@ -11,6 +11,9 @@ RUN npm install express-generator -g
 RUN apt-get update || : && apt-get install python -y
 RUN apt-get install python3-pip -y
 
+RUN apt-get install -y p7zip \
+    zip \
+    unzip 
 
 COPY requirements.txt requirements.txt
 
