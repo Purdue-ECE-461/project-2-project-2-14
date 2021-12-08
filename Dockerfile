@@ -1,4 +1,4 @@
-FROM node:16
+FROM node:latest
 
 WORKDIR /app
 
@@ -19,11 +19,13 @@ COPY requirements.txt requirements.txt
 
 # install dependencies to the local user directory (eg. /root/.local)
 RUN pip3 install --user -r requirements.txt
+#RUN pip3 install requests
+#RUN pip3 install numpy
+#RUN pip3 install coverage
 
+#ENV PORT=8080
 
-ENV PORT=8080
-
-EXPOSE 8080
+#EXPOSE 8080
 
 #requests==2.26.0
 #numpy==1.19.5
