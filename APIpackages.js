@@ -21,7 +21,7 @@ const {
 } = require("get-github-default-branch-name");
 const https = require("https");
 const logger = require("./logger");
-const exec = require("child_process").execSync
+const exec = require("child_process").execSync;
 
 // gets all the packages that match the queries
 // paginated with a page size of OFFSET_SIZE in config.js
@@ -352,6 +352,9 @@ async function addZip(contentBuf, metadata, uploadID) {
     logger.write(
         `Rating package at: ${url} for package with id: ${metadata.ID}`
     );
+    if (!rating) {
+        return { error: "Could not rate module" };
+    }
     if (!checkRating(rating)) {
         return { error: "package did not have the needed score" };
     }
@@ -432,6 +435,9 @@ async function addRepo(url, metadata, uploadID) {
     );
 
     const rating = rate(url, unzipPath);
+    if (!rating) {
+        return { error: "Could not rate module" };
+    }
     logger.write(
         `Rating package at: ${url} for package with id: ${metadata.ID}`
     );
@@ -459,29 +465,33 @@ function checkRating(rating) {
     }
     const min = config.MIN_SCORE;
     return (
-        rating[config.BUS_FACTOR_SCORE] > min &&
-        rating[config.CORRECTNESS_SCORE] > min &&
-        rating[config.RAMP_UP_SCORE] > min &&
-        rating[config.RESPONSIVE_MAINTAINER_SCORE] > min &&
-        rating[config.LICENSE_SCORE] > min &&
-        rating[config.GOOD_PINNING_SCORE] > min
+        rating[config.BUS_FACTOR_SCORE] >= min &&
+        rating[config.CORRECTNESS_SCORE] >= min &&
+        rating[config.RAMP_UP_SCORE] >= min &&
+        rating[config.RESPONSIVE_MAINTAINER_SCORE] >= min &&
+        rating[config.LICENSE_SCORE] >= min &&
+        rating[config.GOOD_PINNING_SCORE] >= min
     );
 }
 
 function rate(url, packagePath) {
-    console.log(url);
-    console.log(packagePath);
-    data = exec(`rating2/run ${packagePath} ${url}`).toString
-    data = data.split(" ");
-    data[6] = data[6].slice(0, -1);
+    let data;
+    try {
+        data = exec(`rating/run ${url} ${packagePath}`).toString();
+        data = data.split(" ");
+        data[5] = data[5].slice(0, -1);
+    } catch {
+        return null;
+    }
+
     const rating = {};
-    rating[config.BUS_FACTOR_SCORE] = data[2]
-    rating[config.CORRECTNESS_SCORE] = data[4]
-    rating[config.RAMP_UP_SCORE] = data[1]
-    rating[config.RESPONSIVE_MAINTAINER_SCORE] = data[3]
-    rating[config.LICENSE_SCORE] = data[0]
-    rating[config.GOOD_PINNING_SCORE] = data[5]
-    return rating
+    rating[config.BUS_FACTOR_SCORE] = data[2];
+    rating[config.CORRECTNESS_SCORE] = data[4];
+    rating[config.RAMP_UP_SCORE] = data[1];
+    rating[config.RESPONSIVE_MAINTAINER_SCORE] = data[3];
+    rating[config.LICENSE_SCORE] = data[0];
+    rating[config.GOOD_PINNING_SCORE] = data[5];
+    return rating;
 }
 
 // endpoint that returns the package score
