@@ -3,7 +3,6 @@ import subprocess
 import random
 import requests
 from src.config import *
-import github
 
 def getjs(packagePath):
     outlist = []
