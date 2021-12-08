@@ -9,6 +9,9 @@ const {
     unzipTmp,
     getUrlFromPackageFiles,
     checkMetadata,
+    generateKey,
+    createTmpFolder,
+    removeTmpFolder,
 } = require("./helper");
 const db = require("./firestore");
 const checkAuth = require("./checkAuth");
@@ -293,31 +296,34 @@ async function updatePackage(req, res) {
 
 // uploads a zip to the database based on the packageUrl and content parameters
 async function upload(packageUrl, content, metadata) {
+    const uploadID = generateKey(4);
+    createTmpFolder(uploadID);
+    logger.write(`Creating a folder in tmp with upload id: ${uploadID}`);
     // if the packageUrl is provided get the package zip from the url
     if (packageUrl) {
-        metadata = await addRepo(packageUrl, metadata);
+        metadata = await addRepo(packageUrl, metadata, uploadID);
     }
     // if the package url is not provided get the zip from the content
     // which is a base64 encoded string of the zip data
     else if (content) {
         const zippedBuf = Buffer.from(content, "base64");
-        metadata = await addZip(zippedBuf, metadata);
+        metadata = await addZip(zippedBuf, metadata, uploadID);
     }
 
     if (!metadata) {
         return null;
     }
-    // return the metadata with the url of the package saved and empty the tmp folder
-    emptyTmp();
-    logger.write(`Emptied the tmp folder`);
+    // return the metadata with the url of the package saved and delete the folder in tmp
+    removeTmpFolder(uploadID);
+    logger.write(`Removing the folder in tmp with upload id: ${uploadID}`);
     return metadata;
 }
 
 // save the contents of the content buffer in the database
-async function addZip(contentBuf, metadata) {
+async function addZip(contentBuf, metadata, uploadID) {
     // write to temp folder
     fs.writeFileSync(
-        `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`,
+        `${config.TMP_FOLDER}/${uploadID}/${config.TMP_FOLDER}.zip`,
         contentBuf
     );
     logger.write(
@@ -325,7 +331,7 @@ async function addZip(contentBuf, metadata) {
     );
 
     // unzip in tmp folder
-    const unzipPath = await unzipTmp();
+    const unzipPath = await unzipTmp(uploadID);
     if (!unzipPath) {
         return { error: "incorrect zip data" };
     }
@@ -352,7 +358,7 @@ async function addZip(contentBuf, metadata) {
 
     // upload to cloud storage
     let success = await db.uploadPackage(
-        `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`,
+        `${config.TMP_FOLDER}/${uploadID}/${config.TMP_FOLDER}.zip`,
         metadata
     );
     if (!success) {
@@ -365,7 +371,7 @@ async function addZip(contentBuf, metadata) {
 }
 
 // get the zip of the default branch and save it in the database
-async function addRepo(url, metadata) {
+async function addRepo(url, metadata, uploadID) {
     metadata.url = url;
     // remove the host name from the url
     try {
@@ -397,7 +403,7 @@ async function addRepo(url, metadata) {
             response
                 .pipe(
                     fs.createWriteStream(
-                        `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`
+                        `${config.TMP_FOLDER}/${uploadID}/${config.TMP_FOLDER}.zip`
                     )
                 )
                 .on("finish", () => {
@@ -416,7 +422,7 @@ async function addRepo(url, metadata) {
     );
 
     // unzip the package in tmp folder
-    const unzipPath = await unzipTmp();
+    const unzipPath = await unzipTmp(uploadID);
     if (!unzipPath) {
         return null;
     }
@@ -432,7 +438,7 @@ async function addRepo(url, metadata) {
 
     //upload to google cloud storage
     success = await db.uploadPackage(
-        `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`,
+        `${config.TMP_FOLDER}/${uploadID}/${config.TMP_FOLDER}.zip`,
         metadata
     );
     if (!success) {
