@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:16
 
 WORKDIR /app
 
@@ -15,4 +15,5 @@ RUN apt-get update && \
 
 COPY . .
 
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
+#CMD ["node", "server.js"]
