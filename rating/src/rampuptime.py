@@ -53,9 +53,9 @@ def rampuptime(repoDir, numStars, max_stars, commitsUrl):
             lines = readmeFile.readlines()
             numLines = len(lines)
 
-            if numLines < 500 and numLines > 50:
-                numLineScore = numLines / 500
-            elif numLines >= 500:
+            if numLines < 400 and numLines > 50:
+                numLineScore = numLines / 400
+            elif numLines >= 400:
                 numLineScore = 1
 
             hasInstall = False
@@ -71,10 +71,10 @@ def rampuptime(repoDir, numStars, max_stars, commitsUrl):
                 hasInstallScore = 1
 
             numCodeBlocks /= 2
-            if numCodeBlocks > 10:
+            if numCodeBlocks > 7:
                 numCodeBlockScore = 1
-            elif numCodeBlockScore <= 10:
-                numCodeBlockScore = numCodeBlocks / 10
+            elif numCodeBlockScore <= 7:
+                numCodeBlockScore = numCodeBlocks / 7
 
         response = requests.get(f"{commitsUrl}?path={readmeFileName}&page=1&per_page=1", headers={'Authorization': f"token {GITHUB_TOKEN}"})
         commit = response.json()
