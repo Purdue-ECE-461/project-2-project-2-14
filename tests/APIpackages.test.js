@@ -170,6 +170,34 @@ describe("API packages test", () => {
         expect(responseData.ID).toBe(data.metadata.ID);
     }, 10000);
 
+    // update
+    test("update package with wrong metadata", async () => {
+        const data = {
+            metadata: {
+                Name: "local-package1",
+                Version: "4.6.2",
+                ID: "93u09wf",
+            },
+            data: {
+                URL: "https://github.com/expressjs/express",
+            },
+        };
+        const options = {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Authorization": `bearer ${adminAuthKey}`,
+            },
+            body: JSON.stringify(data),
+        };
+
+        const response = await fetch(
+            "http://localhost:3000/package/93u09wfdv",
+            options
+        );
+        expect(response.status).toBe(400);
+    }, 10000);
+
     // rate
     test("rate package", async () => {
         const options = {
@@ -213,7 +241,6 @@ describe("API packages test", () => {
         expect(responseData.length).toBe(4);
     });
 
-    // // install multiple packages with the same name
     test("uploading three files together", async () => {
         let str = fs.readFileSync("tests/tmp.zip", "base64");
         const responseArr = [];
@@ -319,6 +346,22 @@ describe("API packages test", () => {
             options
         );
         expect(response.status).toBe(401);
+    });
+
+    test("get package that does not exist", async () => {
+        const options = {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Authorization": `bearer ${adminAuthKey}`,
+            },
+        };
+
+        const response = await fetch(
+            `http://localhost:3000/package/${randomPackageID + 1}`,
+            options
+        );
+        expect(response.status).toBe(404);
     });
 
     delete test("delete by id", async () => {

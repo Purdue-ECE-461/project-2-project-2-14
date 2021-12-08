@@ -78,7 +78,7 @@ async function deleteUser(req, res) {
         return;
     }
 
-    const username = req.body?.username;
+    const username = req.params?.username;
 
     if (!username) {
         res.status(400).send("Incorrect inputs");
@@ -87,6 +87,7 @@ async function deleteUser(req, res) {
 
     if (username === config.ADMIN_USERNAME) {
         res.status(400).send("Cannot delete the username");
+        return;
     }
 
     await db.deleteUser(username);

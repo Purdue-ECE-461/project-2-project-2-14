@@ -40,7 +40,7 @@ app.post(`/user`, (req, res) => {
     }
 });
 
-app.delete(`/user`, (req, res) => {
+app.delete(`/user/:username`, (req, res) => {
     try {
         APIusers.deleteUser(req, res);
     } catch (e) {
