@@ -1,0 +1,702 @@
+openapi: 3.0.2
+info:
+  title: TrustWorthy Module Registry
+  version: 1.0.0
+  description: API built for ACME Corp. and its employees to access trustworthy modules easliy
+  termsOfService: http://swagger.io/terms/
+  contact:
+    name: Team 14
+    url: https://ece461project2-333702.uc.r.appspot.com
+    email: ece461project22@gmail.com
+servers:
+  - url: https://ece461project2-333702.uc.r.appspot.com
+    description: Main server for team 14
+paths:
+  /packages:
+    summary: Query the registry.
+    description: |-
+      Search for packages satisfying the indicated query.
+
+      If you want to enumerate all packages, provide an array with a single PackageQuery whose name is "*".
+
+      The response is paginated; the response header includes the offset to use in the next query.
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/PackageQuery'
+            examples:
+              ex:
+                value:
+                  - Version: 3.6.1-4.10.1
+                    Name: localPackage5
+                  - Version: ^5.1.1
+                    Name: localPackage5
+        required: true
+      parameters:
+        - name: offset
+          description: Provide this for pagination.
+          schema:
+            $ref: '#/components/schemas/EnumerateOffset'
+          in: query
+          required: true
+        - name: X-Authorization
+          description: ''
+          schema:
+            $ref: '#/components/schemas/AuthenticationToken'
+          in: header
+          required: true
+      responses:
+        '200':
+          headers:
+            offset:
+              schema:
+                $ref: '#/components/schemas/EnumerateOffset'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PackageMetadata'
+              examples:
+                laurent_cats:
+                  value:
+                    - id: 1
+                      name: Zaza
+                      tag: cat
+                    - id: 2
+                      name: Tigresse
+                      tag: cat
+                    - id: 3
+                      name: Maki
+                      tag: cat
+                    - id: 4
+                      name: Toufik
+                      tag: cat
+          description: List of packages
+        '401':
+          description: Failed due to failure in authorization
+        '500':
+          description: Failed due to internal server error
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: unexpected error
+      operationId: PackagesList
+      summary: Get packages based on query
+      description: Get any packages fitting the query.
+    parameters:
+      - name: X-Authorization
+        description: ''
+        schema:
+          $ref: '#/components/schemas/AuthenticationToken'
+        in: header
+  /reset:
+    summary: Reset registry
+    delete:
+      responses:
+        '200':
+          description: Registry has been reset
+        '401':
+          description: You do not have authorization to reset the registry
+        '500':
+          description: Reset failed due to Interval Server Error.
+      operationId: RegistryReset
+      summary: Reset the registry
+    parameters:
+      - name: X-Authorization
+        description: Authorization token for the user requesting the reset
+        schema:
+          $ref: '#/components/schemas/AuthenticationToken'
+        in: header
+  /package/{id}:
+    summary: Interact with the package with this ID
+    get:
+      parameters:
+        - name: id
+          description: ID of package to fetch
+          schema:
+            $ref: '#/components/schemas/PackageID'
+          in: path
+          required: true
+        - name: X-Authorization
+          description: ''
+          schema:
+            $ref: '#/components/schemas/AuthenticationToken'
+          in: header
+          required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Package'
+          description: Request Successful. Download should start soon.
+        '401':
+          description: Initiating download failed due to failure in authorization
+        '500':
+          description: Request unsuccessful due to internal server error.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: unexpected error
+      operationId: PackageRetrieve
+      summary: Download the package specified by the id
+      description: This endpoint returns the package specified by the id.
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Package'
+        required: true
+      parameters:
+        - name: id
+          description: ''
+          schema:
+            $ref: '#/components/schemas/PackageID'
+          in: path
+          required: true
+        - name: X-Authorization
+          description: ''
+          schema:
+            $ref: '#/components/schemas/AuthenticationToken'
+          in: header
+          required: true
+      responses:
+        '200':
+          description: Success.
+        '400':
+          description: Malformed request.
+        '401':
+          description: Failed due to failure in authorization
+        '500':
+          description: Failed due to internal server error
+      operationId: PackageUpdate
+      summary: Update this version of the package.
+      description: |-
+        The name, version, and ID must match.
+
+        The package contents (from PackageData) will replace the previous contents.
+    delete:
+      parameters:
+        - name: id
+          description: Package ID
+          schema:
+            $ref: '#/components/schemas/PackageID'
+          in: path
+          required: true
+        - name: X-Authorization
+          description: ''
+          schema:
+            $ref: '#/components/schemas/AuthenticationToken'
+          in: header
+          required: true
+      responses:
+        '200':
+          description: Package is deleted.
+        '400':
+          description: ID not defined, i.e. no such package.
+        '401':
+          description: Deletion failed due to failure in authorization
+        '500':
+          description: Deletion failed due to internal server error.
+      operationId: PackageDelete
+      summary: Delete the package specified by the ID
+    parameters:
+      - name: id
+        description: Package ID
+        schema:
+          $ref: '#/components/schemas/PackageID'
+        in: path
+        required: true
+      - name: X-Authorization
+        description: ''
+        schema:
+          $ref: '#/components/schemas/AuthenticationToken'
+        in: header
+  /package:
+    summary: Create a version of a package
+    description: The "ID" field in the request body allows the user to use their own ID scheme. If this ID is already in use, the system chooses a new ID and indicates this in the response body.
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Package'
+            examples:
+              ex:
+                value:
+                  metadata:
+                    Name: express
+                    Version: 4.17.1
+                    ID: 93u09wcdsfsdv
+                  data:
+                    URL: https://github.com/expressjs/express
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackageMetadata'
+              examples:
+                ex:
+                  value:
+                    Name: express
+                    Version: 4.17.1
+                    ID: 93u09wcdsfsdv
+                    isSensitive: false
+                    url: https://github.com/expressjs/express
+                    rating:
+                      BusFactor: '0.99'
+                      Correctness: '0.75'
+                      RampUp: '0.84'
+                      ResponsiveMaintainer: '0.5'
+                      LicenseScore: '1.0'
+                      GoodPinningPractice: '1.0'
+          description: Success. Check the ID in the returned metadata for the official ID.
+        '400':
+          description: Malformed request.
+        '401':
+          description: Failed. You are unauthorized to add to the registry
+        '500':
+          description: Failed to add package due to internal server error
+      operationId: PackageCreate
+      summary: Create a new package
+      description: This endpoint will ingest a new package into the registry after ensuring that the package meets the trustworthiness requirements.
+    parameters:
+      - name: X-Authorization
+        description: ''
+        schema:
+          $ref: '#/components/schemas/AuthenticationToken'
+        in: header
+        required: true
+  /package/{id}/rate:
+    summary: Get the rating for this package.
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackageRating'
+          description: Rating. Only use this if each metric was computed successfully.
+        '400':
+          description: No such package.
+        '401':
+          description: Failed due to invalid credentials
+        '500':
+          description: The package rating system choked on at least one of the metrics.
+      operationId: PackageRate
+      summary: Get rating for Package specified by ID
+    parameters:
+      - name: id
+        schema:
+          $ref: '#/components/schemas/PackageID'
+        in: path
+        required: true
+      - name: X-Authorization
+        description: ''
+        schema:
+          $ref: '#/components/schemas/AuthenticationToken'
+        in: header
+        required: true
+  /authenticate:
+    summary: Authenticate this user -- get an access token.
+    description: |-
+      If your system supports the authentication scheme described in the spec, then:
+
+      1. The obtained token should be provided to the other endpoints via the "X-Authorization" header.
+      2. The "Authorization" header is *required* in your system.
+
+      Otherwise, this endpoint should return HTTP 501 "Not implemented", and the "X-Authorization" header should be unused for the other endpoints.
+    servers:
+      - url: https://ece461project2-333702.uc.r.appspot.com
+        description: ''
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthReq'
+        required: true
+      servers:
+        - url: https://ece461project2-333702.uc.r.appspot.com
+          description: ''
+      responses:
+        '200':
+          content:
+            text/xml:
+              schema:
+                type: string
+          description: This mean authentication was successfull and access token will be sent
+        '401':
+          content:
+            text/xml:
+              schema:
+                type: string
+              examples:
+                authFailed:
+                  value: No such user or invalid password
+          description: Authentication Failed
+      operationId: createToken
+      summary: Authenticate a user
+  /package/byName/{name}:
+    summary: Interact with the package with this name
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PackageHistoryEntry'
+              examples:
+                zaza:
+                  value:
+                    id: 1
+                    name: Zaza
+                    tag: cat
+          description: Package history fetched
+        '400':
+          description: No package with that name
+        '401':
+          description: Unable to get package history due to failed authorization
+        '500':
+          description: Failed due to internal server error
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: unexpected error
+      operationId: PackageByNameGet
+      description: Return the history of this package (all versions).
+    delete:
+      parameters:
+        - name: name
+          schema:
+            $ref: '#/components/schemas/PackageName'
+          in: path
+          required: true
+      responses:
+        '200':
+          description: Package is deleted.
+        '400':
+          description: No package with that name
+        '401':
+          description: Unable to delete due to failure in authorization
+        '500':
+          description: Failed due to internal server error
+      operationId: PackageByNameDelete
+      summary: Delete the package specified by name
+    parameters:
+      - name: name
+        schema:
+          $ref: '#/components/schemas/PackageName'
+        in: path
+        required: true
+      - name: X-Authorization
+        description: ''
+        schema:
+          $ref: '#/components/schemas/AuthenticationToken'
+        in: header
+        required: true
+  /user:
+    servers:
+      - url: https://ece461project2-333702.uc.r.appspot.com
+        description: This is the main server for Team 14
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+        required: true
+      servers:
+        - url: https://ece461project2-333702.uc.r.appspot.com
+          description: ''
+      responses:
+        '200':
+          description: New user has been created
+        '401':
+          description: User not created because authorization failed
+        '500':
+          description: Internal Server Error
+      security:
+        - UserAndPasswordYieldsToken: []
+      summary: Create New User
+  /user/{username}:
+    delete:
+      parameters:
+        - name: X-Authorization
+          description: Authentication token
+          schema:
+            $ref: '#/components/schemas/AuthenticationToken'
+          in: header
+          required: true
+      responses:
+        '200':
+          description: |
+            User Deleted
+        '400':
+          description: Failed. No user with that username
+        '401':
+          description: Unable to delete due to invalid authentication token
+        '500':
+          description: Failed to delete due to internal server error
+      operationId: usernameDelete
+      summary: Delete user specified by username
+      description: Use end point to remove a user from the company user database
+    parameters:
+      - name: username
+        description: username of the user to be deleted
+        schema:
+          type: string
+        in: path
+        required: true
+components:
+  schemas:
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          format: int32
+          type: integer
+        message:
+          type: string
+    Package:
+      required:
+        - metadata
+        - data
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/PackageMetadata'
+          description: ''
+        data:
+          $ref: '#/components/schemas/PackageData'
+          description: ''
+    PackageMetadata:
+      description: |-
+        The "Name" and "Version" are used as a unique identifier pair when uploading a package.
+
+        The "ID" is used as an internal identifier for interacting with existing packages.
+      required:
+        - Name
+        - Version
+        - ID
+      type: object
+      properties:
+        Name:
+          $ref: '#/components/schemas/PackageName'
+          description: Package name
+          example: my-package
+        Version:
+          description: Package version
+          type: string
+          example: 1.2.3
+        ID:
+          $ref: '#/components/schemas/PackageID'
+          description: Unique ID for use with the /package/{id} endpoint.
+          example: '123567192081501'
+    PackageData:
+      description: |-
+        This is a "union" type.
+        - On package upload, either Content or URL should be set.
+        - On package update, exactly one field should be set.
+        - On download, the Content field should be set.
+      # required: []
+      type: object
+      properties:
+        Content:
+          description: |-
+            Package contents. This is the zip file uploaded by the user. (Encoded as text using a Base64 encoding).
+
+            This will be a zipped version of an npm package's GitHub repository, minus the ".git/" directory." It will, for example, include the "package.json" file that can be used to retrieve the project homepage.
+
+            See https://docs.npmjs.com/cli/v7/configuring-npm/package-json#homepage.
+          type: string
+        URL:
+          description: Package URL (for use in public ingest).
+          type: string
+        JSProgram:
+          description: A JavaScript program (for use with sensitive modules).
+          type: string
+    UserAuthenticationInfo:
+      description: Authentication info for a user
+      required:
+        - password
+      type: object
+      properties:
+        password:
+          description: Password for a user. Per the spec, this should be a "strong" password.
+          type: string
+    PackageID:
+      description: ''
+      type: string
+    PackageRating:
+      description: |-
+        Package rating (cf. Project 1).
+
+        If the Project 1 that you inherited does not support one or more of the original properties, denote this with the value "-1".
+      required:
+        - RampUp
+        - Correctness
+        - BusFactor
+        - ResponsiveMaintainer
+        - LicenseScore
+        - GoodPinningPractice
+      type: object
+      properties:
+        BusFactor:
+          format: double
+          description: ''
+          type: number
+        Correctness:
+          format: double
+          description: ''
+          type: number
+        RampUp:
+          format: double
+          description: ''
+          type: number
+        ResponsiveMaintainer:
+          format: double
+          description: ''
+          type: number
+        LicenseScore:
+          format: double
+          description: ''
+          type: number
+        GoodPinningPractice:
+          format: double
+          description: The fraction of its dependencies that are pinned to at least a specific major+minor version, e.g. version 2.3.X of a package. (If there are zero dependencies, they should receive a 1.0 rating. If there are two dependencies, one pinned to this degree, then they should receive a Â½ = 0.5 rating).
+          type: number
+    PackageHistoryEntry:
+      description: One entry of the history of this package.
+      required:
+        - Date
+        - PackageMetadata
+        - Action
+      type: object
+      properties:
+        Date:
+          format: date-time
+          description: Date of activity.
+          type: string
+        PackageMetadata:
+          $ref: '#/components/schemas/PackageMetadata'
+          description: ''
+        Action:
+          description: ''
+          enum:
+            - CREATE
+            - UPDATE
+            - DOWNLOAD
+            - RATE
+          type: string
+    PackageName:
+      description: |-
+        Name of a package.
+
+        - Names should only use typical "keyboard" characters.
+        - The name "*" is reserved. See the `/packages` API for its meaning.
+      type: string
+    AuthenticationToken:
+      description: 'The spec permits you to use any token format you like. You could, for example, look into JSON Web Tokens ("JWT", pronounced "jots"): https://jwt.io.'
+      type: string
+    SemverRange:
+      description: ''
+      type: string
+      example: |-
+        Exact (1.2.3)
+        Bounded range (1.2.3-2.1.0)
+        Carat (^1.2.3)
+        Tilde (~1.2.0)
+    PackageQuery:
+      description: ''
+      required:
+        - Name
+      type: object
+      properties:
+        Version:
+          $ref: '#/components/schemas/SemverRange'
+          description: ''
+        Name:
+          $ref: '#/components/schemas/PackageName'
+          description: ''
+    EnumerateOffset:
+      description: Offset in pagination.
+      type: string
+      example: '1'
+    NewUser:
+      title: Root Type for NewUser
+      description: Information about the new user
+      type: object
+      properties:
+        username:
+          description: username of the new user
+          type: string
+        isAdmin:
+          description: Is the new user being added an admin?
+          type: boolean
+        password:
+          description: password for the new user's login
+          type: string
+      example:
+        username: sidd
+        isAdmin: false
+        password: sidd
+    AuthReq:
+      title: Root Type for AuthReq
+      description: Request for generate authentication token
+      required:
+        - NewUser
+      type: object
+      properties:
+        NewUser:
+          $ref: '#/components/schemas/NewUser'
+          description: Information about the new user
+          properties:
+            name:
+              type: string
+            isAdmin:
+              type: boolean
+        Secret:
+          type: object
+          properties:
+            password:
+              type: string
+      example:
+        NewUser:
+          name: admin
+          isAdmin: true
+        Secret:
+          password: ece461
+    onlyUsername:
+      title: Root Type for onlyUsername
+      description: Just the username of the user
+      type: object
+      properties:
+        username:
+          type: string
+      example:
+        username: devansh
+  securitySchemes:
+    UserAndPasswordYieldsToken:
+      type: apiKey
+      description: Use the /authentication endpoint to obtain an authorization token.
+      name: X-Authorization
+      in: header
