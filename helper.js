@@ -11,9 +11,9 @@ function generateHash(string) {
     return crypto.createHash("md5").update(string).digest("hex");
 }
 
-// generates a random key of len bytes
-function generateKey(len) {
-    return crypto.randomBytes(len).toString("hex");
+// generates a random key of 'bytes' bytes
+function generateKey(bytes) {
+    return crypto.randomBytes(bytes).toString("hex");
 }
 
 // waites for ms milliseconds before resolving
@@ -78,6 +78,33 @@ async function emptyTmp() {
     });
 }
 
+async function createTmpFolder(id) {
+    const directory = config.TMP_FOLDER;
+    return await new Promise((resolve, reject) => {
+        fs.mkdir(`${directory}/${id}`, (err) => {
+            if (err) {
+                resolve(false);
+                return;
+            }
+            resolve(true);
+        });
+    });
+}
+
+async function removeTmpFolder(id) {
+    const directory = config.TMP_FOLDER;
+
+    return new Promise((resolve, reject) => {
+        fs.rm(`${directory}/${id}`, { recursive: true }, (err) => {
+            if (err) {
+                resolve(false);
+                return;
+            }
+            resolve(true);
+        });
+    });
+}
+
 // checks if zip file is in the right format
 async function checkZip(path) {
     return new Promise((resolve, reject) => {
@@ -92,16 +119,20 @@ async function checkZip(path) {
 }
 
 // unzips the tmp.zip file in the tmp folder and places it contents in the tmp/ folder
-async function unzipTmp() {
-    if (!(await checkZip(`${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`))) {
+async function unzipTmp(uploadID) {
+    if (
+        !(await checkZip(
+            `${config.TMP_FOLDER}/${uploadID}/${config.TMP_FOLDER}.zip`
+        ))
+    ) {
         return null;
     }
     const success = await new Promise((resolve, reject) => {
         spawn("unzip", [
             "-o",
-            `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`,
+            `${config.TMP_FOLDER}/${uploadID}/${config.TMP_FOLDER}.zip`,
             "-d",
-            `${config.TMP_FOLDER}/`,
+            `${config.TMP_FOLDER}/${uploadID}/`,
         ])
             .on("exit", function (code) {
                 resolve(true);
@@ -114,18 +145,18 @@ async function unzipTmp() {
         return null;
     }
 
-    const packageDir = await getTmpPackageDir();
+    const packageDir = await getUnzippedPackageDir(uploadID);
     if (packageDir === null) {
         return null;
     }
 
-    return `${config.TMP_FOLDER}/${packageDir}`;
+    return `${config.TMP_FOLDER}/${uploadID}/${packageDir}`;
 }
 
 // gets the unzipped package directory by looking through the tmp folder
-async function getTmpPackageDir() {
+async function getUnzippedPackageDir(uploadID) {
     return new Promise((resolve, reject) => {
-        fs.readdir(`${config.TMP_FOLDER}/`, (err, files) => {
+        fs.readdir(`${config.TMP_FOLDER}/${uploadID}/`, (err, files) => {
             if (err) {
                 resolve(null);
                 return;
@@ -169,7 +200,9 @@ module.exports = {
     encodeVersion,
     emptyTmp,
     unzipTmp,
-    getTmpPackageDir,
+    getUnzippedPackageDir,
     getUrlFromPackageFiles,
     checkMetadata,
+    createTmpFolder,
+    removeTmpFolder,
 };

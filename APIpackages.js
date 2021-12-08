@@ -9,6 +9,9 @@ const {
     unzipTmp,
     getUrlFromPackageFiles,
     checkMetadata,
+    generateKey,
+    createTmpFolder,
+    removeTmpFolder,
 } = require("./helper");
 const db = require("./firestore");
 const checkAuth = require("./checkAuth");
@@ -18,6 +21,7 @@ const {
 } = require("get-github-default-branch-name");
 const https = require("https");
 const logger = require("./logger");
+const exec = require("child_process").execSync;
 
 // gets all the packages that match the queries
 // paginated with a page size of OFFSET_SIZE in config.js
@@ -293,31 +297,34 @@ async function updatePackage(req, res) {
 
 // uploads a zip to the database based on the packageUrl and content parameters
 async function upload(packageUrl, content, metadata) {
+    const uploadID = generateKey(4);
+    createTmpFolder(uploadID);
+    logger.write(`Creating a folder in tmp with upload id: ${uploadID}`);
     // if the packageUrl is provided get the package zip from the url
     if (packageUrl) {
-        metadata = await addRepo(packageUrl, metadata);
+        metadata = await addRepo(packageUrl, metadata, uploadID);
     }
     // if the package url is not provided get the zip from the content
     // which is a base64 encoded string of the zip data
     else if (content) {
         const zippedBuf = Buffer.from(content, "base64");
-        metadata = await addZip(zippedBuf, metadata);
+        metadata = await addZip(zippedBuf, metadata, uploadID);
     }
 
     if (!metadata) {
         return null;
     }
-    // return the metadata with the url of the package saved and empty the tmp folder
-    emptyTmp();
-    logger.write(`Emptied the tmp folder`);
+    // return the metadata with the url of the package saved and delete the folder in tmp
+    removeTmpFolder(uploadID);
+    logger.write(`Removing the folder in tmp with upload id: ${uploadID}`);
     return metadata;
 }
 
 // save the contents of the content buffer in the database
-async function addZip(contentBuf, metadata) {
+async function addZip(contentBuf, metadata, uploadID) {
     // write to temp folder
     fs.writeFileSync(
-        `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`,
+        `${config.TMP_FOLDER}/${uploadID}/${config.TMP_FOLDER}.zip`,
         contentBuf
     );
     logger.write(
@@ -325,7 +332,7 @@ async function addZip(contentBuf, metadata) {
     );
 
     // unzip in tmp folder
-    const unzipPath = await unzipTmp();
+    const unzipPath = await unzipTmp(uploadID);
     if (!unzipPath) {
         return { error: "incorrect zip data" };
     }
@@ -341,10 +348,13 @@ async function addZip(contentBuf, metadata) {
     metadata.url = url;
 
     // rate and check if required score was met
-    const rating = await rate(url, unzipPath);
+    const rating = rate(url, unzipPath);
     logger.write(
         `Rating package at: ${url} for package with id: ${metadata.ID}`
     );
+    if (!rating) {
+        return { error: "Could not rate module" };
+    }
     if (!checkRating(rating)) {
         return { error: "package did not have the needed score" };
     }
@@ -352,7 +362,7 @@ async function addZip(contentBuf, metadata) {
 
     // upload to cloud storage
     let success = await db.uploadPackage(
-        `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`,
+        `${config.TMP_FOLDER}/${uploadID}/${config.TMP_FOLDER}.zip`,
         metadata
     );
     if (!success) {
@@ -365,7 +375,7 @@ async function addZip(contentBuf, metadata) {
 }
 
 // get the zip of the default branch and save it in the database
-async function addRepo(url, metadata) {
+async function addRepo(url, metadata, uploadID) {
     metadata.url = url;
     // remove the host name from the url
     try {
@@ -397,7 +407,7 @@ async function addRepo(url, metadata) {
             response
                 .pipe(
                     fs.createWriteStream(
-                        `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`
+                        `${config.TMP_FOLDER}/${uploadID}/${config.TMP_FOLDER}.zip`
                     )
                 )
                 .on("finish", () => {
@@ -416,7 +426,7 @@ async function addRepo(url, metadata) {
     );
 
     // unzip the package in tmp folder
-    const unzipPath = await unzipTmp();
+    const unzipPath = await unzipTmp(uploadID);
     if (!unzipPath) {
         return null;
     }
@@ -424,7 +434,10 @@ async function addRepo(url, metadata) {
         `Unzipped package files at tmp for package with id: ${metadata.ID}`
     );
 
-    const rating = await rate(url, unzipPath);
+    const rating = rate(url, unzipPath);
+    if (!rating) {
+        return { error: "Could not rate module" };
+    }
     logger.write(
         `Rating package at: ${url} for package with id: ${metadata.ID}`
     );
@@ -432,7 +445,7 @@ async function addRepo(url, metadata) {
 
     //upload to google cloud storage
     success = await db.uploadPackage(
-        `${config.TMP_FOLDER}/${config.TMP_FOLDER}.zip`,
+        `${config.TMP_FOLDER}/${uploadID}/${config.TMP_FOLDER}.zip`,
         metadata
     );
     if (!success) {
@@ -452,30 +465,33 @@ function checkRating(rating) {
     }
     const min = config.MIN_SCORE;
     return (
-        rating[config.BUS_FACTOR_SCORE] > min &&
-        rating[config.CORRECTNESS_SCORE] > min &&
-        rating[config.RAMP_UP_SCORE] > min &&
-        rating[config.RESPONSIVE_MAINTAINER_SCORE] > min &&
-        rating[config.LICENSE_SCORE] > min &&
-        rating[config.GOOD_PINNING_SCORE] > min
+        rating[config.BUS_FACTOR_SCORE] >= min &&
+        rating[config.CORRECTNESS_SCORE] >= min &&
+        rating[config.RAMP_UP_SCORE] >= min &&
+        rating[config.RESPONSIVE_MAINTAINER_SCORE] >= min &&
+        rating[config.LICENSE_SCORE] >= min &&
+        rating[config.GOOD_PINNING_SCORE] >= min
     );
 }
 
-async function rate(url, packagePath) {
-    console.log(url);
-    console.log(packagePath);
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve({
-                BusFactor: 1,
-                Correctness: 1,
-                RampUp: 1,
-                ResponsiveMaintainer: 1,
-                LicenseScore: 1,
-                GoodPinningPractice: 1,
-            });
-        }, 1000);
-    });
+function rate(url, packagePath) {
+    let data;
+    try {
+        data = exec(`rating/run ${url} ${packagePath}`).toString();
+        data = data.split(" ");
+        data[5] = data[5].slice(0, -1);
+    } catch {
+        return null;
+    }
+
+    const rating = {};
+    rating[config.BUS_FACTOR_SCORE] = data[2];
+    rating[config.CORRECTNESS_SCORE] = data[4];
+    rating[config.RAMP_UP_SCORE] = data[1];
+    rating[config.RESPONSIVE_MAINTAINER_SCORE] = data[3];
+    rating[config.LICENSE_SCORE] = data[0];
+    rating[config.GOOD_PINNING_SCORE] = data[5];
+    return rating;
 }
 
 // endpoint that returns the package score

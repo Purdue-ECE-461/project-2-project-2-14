@@ -5,7 +5,7 @@ temp/
 /trial
 base64.js
 tmp/
-
+.DS_Store
 
 node_modules/.bin/acorn
 node_modules/.bin/browserslist
