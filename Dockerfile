@@ -7,7 +7,7 @@ COPY package*.json ./
 RUN npm install
 RUN npm install express-generator -g
 
-
+RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
 RUN apt-get update || : && apt-get install python -y
 RUN apt-get install python3-pip -y
 
@@ -19,6 +19,11 @@ COPY requirements.txt requirements.txt
 
 # install dependencies to the local user directory (eg. /root/.local)
 RUN pip3 install --user -r requirements.txt
+RUN pip3 install pipenv
+ENV PATH $PATH:$HOME/.local/bin
+
+#RUN pipenv install --system --deploy --ignore-pipfile
+
 #RUN pip3 install requests
 #RUN pip3 install numpy
 #RUN pip3 install coverage
