@@ -1,4 +1,4 @@
-FROM node:latest
+FROM beevelop/nodejs-python:latest
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ COPY package*.json ./
 RUN npm install
 RUN npm install express-generator -g
 
-
+RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
 RUN apt-get update || : && apt-get install python -y
 RUN apt-get install python3-pip -y
 
