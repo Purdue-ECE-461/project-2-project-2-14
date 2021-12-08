@@ -60,7 +60,7 @@ describe("API users test", () => {
         );
         const res = new Res();
 
-        await APIusers.createNewUser(req, res);
+        await API.createNewUser(req, res);
         expect(res._status).toBe(200);
     });
 

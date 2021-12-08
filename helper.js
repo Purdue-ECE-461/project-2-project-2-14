@@ -67,10 +67,6 @@ async function emptyTmp() {
 
     return new Promise((resolve, reject) => {
         fs.rm(directory, { recursive: true }, (err) => {
-            if (err) {
-                resolve(false);
-                return;
-            }
             fs.mkdir(directory, () => {
                 resolve(true);
             });
