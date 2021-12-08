@@ -37,7 +37,7 @@ class FirestoreClient {
     }
 
     async getReadStream(path) {
-        logger.write(`Trying to get read stream at ${destination}...`);
+        logger.write(`Trying to get read stream at ${path}...`);
         const [exists] = await this.fileExists(path);
         if (exists) {
             return this.bucket.file(path).createReadStream();
@@ -46,7 +46,7 @@ class FirestoreClient {
     }
 
     async deletePackage(path) {
-        logger.write(`Trying to delete ${destination}...`);
+        logger.write(`Trying to delete ${path}...`);
         const [exists] = await this.fileExists(path);
         if (exists) {
             await this.bucket.file(path).delete();

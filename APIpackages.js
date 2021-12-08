@@ -261,7 +261,6 @@ async function updatePackage(req, res) {
         res.status(404).send("Package does not exist");
         return;
     }
-
     // compare if the metadata matches
     if (!checkMetadata(metadata, newMetadata)) {
         res.status(400).send("Metadata does not match");
@@ -280,10 +279,12 @@ async function updatePackage(req, res) {
     }
 
     // save the log of the action and the new metadata
+
     db.savePackageMetadata(metadata);
     db.saveHistoryLog(req.headers["x-authorization"], metadata, "UPDATE");
 
     // decode the version string before sending it back
+    metadata = { ...metadata };
     metadata.Version = decodeVersion(metadata.Version);
     res.status(200).json(metadata);
     logger.write(
@@ -298,7 +299,7 @@ async function updatePackage(req, res) {
 // uploads a zip to the database based on the packageUrl and content parameters
 async function upload(packageUrl, content, metadata) {
     const uploadID = generateKey(4);
-    createTmpFolder(uploadID);
+    await createTmpFolder(uploadID);
     logger.write(`Creating a folder in tmp with upload id: ${uploadID}`);
     // if the packageUrl is provided get the package zip from the url
     if (packageUrl) {
@@ -419,7 +420,7 @@ async function addRepo(url, metadata, uploadID) {
         });
     });
     if (!success) {
-        return null;
+        return { error: "Could not download module from github" };
     }
     logger.write(
         `Downloaded and stored package from: ${downloadUrl} to tmp for package with id: ${metadata.ID}`
@@ -478,7 +479,6 @@ function rate(url, packagePath) {
     let data;
     try {
         data = exec(`rating/run ${url} ${packagePath}`).toString();
-        console.log(data);
         data = data.split(" ");
         data[5] = data[5].slice(0, -1);
     } catch {
@@ -486,12 +486,12 @@ function rate(url, packagePath) {
     }
 
     const rating = {};
-    rating[config.BUS_FACTOR_SCORE] = data[2];
-    rating[config.CORRECTNESS_SCORE] = data[4];
-    rating[config.RAMP_UP_SCORE] = data[1];
-    rating[config.RESPONSIVE_MAINTAINER_SCORE] = data[3];
-    rating[config.LICENSE_SCORE] = data[0];
-    rating[config.GOOD_PINNING_SCORE] = data[5];
+    rating[config.BUS_FACTOR_SCORE] = parseFloat(data[2]);
+    rating[config.CORRECTNESS_SCORE] = parseFloat(data[4]);
+    rating[config.RAMP_UP_SCORE] = parseFloat(data[1]);
+    rating[config.RESPONSIVE_MAINTAINER_SCORE] = parseFloat(data[3]);
+    rating[config.LICENSE_SCORE] = parseFloat(data[0]);
+    rating[config.GOOD_PINNING_SCORE] = parseFloat(data[5]);
     return rating;
 }
 
