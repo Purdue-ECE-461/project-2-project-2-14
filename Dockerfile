@@ -1,4 +1,4 @@
-FROM beevelop/nodejs-python:latest
+FROM node:latest
 
 WORKDIR /app
 
@@ -19,6 +19,11 @@ COPY requirements.txt requirements.txt
 
 # install dependencies to the local user directory (eg. /root/.local)
 RUN pip3 install --user -r requirements.txt
+RUN pip3 install pipenv
+ENV PATH $PATH:$HOME/.local/bin
+
+#RUN pipenv install --system --deploy --ignore-pipfile
+
 #RUN pip3 install requests
 #RUN pip3 install numpy
 #RUN pip3 install coverage
