@@ -28,13 +28,6 @@ paths:
               type: array
               items:
                 $ref: '#/components/schemas/PackageQuery'
-            examples:
-              ex:
-                value:
-                  - Version: 3.6.1-4.10.1
-                    Name: localPackage5
-                  - Version: ^5.1.1
-                    Name: localPackage5
         required: true
       parameters:
         - name: offset
@@ -51,32 +44,43 @@ paths:
           required: true
       responses:
         '200':
-          headers:
-            offset:
-              schema:
-                $ref: '#/components/schemas/EnumerateOffset'
           content:
             application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PackageMetadata'
               examples:
-                laurent_cats:
+                debug and lodash:
                   value:
-                    - id: 1
-                      name: Zaza
-                      tag: cat
-                    - id: 2
-                      name: Tigresse
-                      tag: cat
-                    - id: 3
-                      name: Maki
-                      tag: cat
-                    - id: 4
-                      name: Toufik
-                      tag: cat
+                    - url: https://github.com/lodash/lodash
+                      Version: 4.17.1
+                      isSensitive: false
+                      ID: 93u09wcdsfsdvs
+                      rating:
+                        Correctness: 0.75
+                        BusFactor: 0.99
+                        ResponsiveMaintainer: 0.8
+                        GoodPinningPractice: 1
+                        LicenseScore: 1
+                        RampUp: 0.72
+                      Name: lodash
+                    - Name: debug
+                      rating:
+                        ResponsiveMaintainer: 0.67
+                        RampUp: 0.86
+                        BusFactor: 0.98
+                        Correctness: 0.75
+                        GoodPinningPractice: 1
+                        LicenseScore: 1
+                      Version: 4.17.1
+                      url: https://github.com/debug-js/debug
+                      ID: 93u09wcdsfsdvsd
+                      isSensitive: false
           description: List of packages
+        '400':
+          content:
+            text/xml:
+              examples:
+                ex:
+                  value: Incorrect query array
+          description: Failed. Invalid query
         '401':
           description: Failed due to failure in authorization
         '500':
@@ -137,8 +141,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/Package'
           description: Request Successful. Download should start soon.
+        '400':
+          content:
+            text/xml:
+              schema:
+                type: string
+              examples:
+                ex:
+                  value: ID not defined
+          description: ID not defined
         '401':
           description: Initiating download failed due to failure in authorization
+        '404':
+          content:
+            text/xml:
+              examples:
+                ex:
+                  value: Package not found
+          description: No package exists with the specified ID
         '500':
           description: Request unsuccessful due to internal server error.
         default:
@@ -156,6 +176,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Package'
+            examples:
+              express:
+                value:
+                  metadata:
+                    Name: express
+                    Version: 4.17.1
+                    ID: 93u09wcdsfsdv
+                  data:
+                    URL: https://github.com/expressjs/express
         required: true
       parameters:
         - name: id
@@ -164,7 +193,10 @@ paths:
             $ref: '#/components/schemas/PackageID'
           in: path
           required: true
-        - name: X-Authorization
+        - examples:
+            ex:
+              value: bearer 2a6fd2085b1eb73a26852eacac410e03
+          name: X-Authorization
           description: ''
           schema:
             $ref: '#/components/schemas/AuthenticationToken'
@@ -172,8 +204,30 @@ paths:
           required: true
       responses:
         '200':
+          content:
+            application/json:
+              examples:
+                express:
+                  value:
+                    Version: 4.17.1
+                    ID: 93u09wcdsfsdv
+                    Name: express
+                    isSensitive: false
+                    url: https://github.com/expressjs/express
+                    rating:
+                      BusFactor: 0.99
+                      Correctness: 0.75
+                      RampUp: 0.87
+                      ResponsiveMaintainer: 0.51
+                      LicenseScore: 1
+                      GoodPinningPractice: 1
           description: Success.
         '400':
+          content:
+            text/xml:
+              examples:
+                ex:
+                  value: Metadata does not match
           description: Malformed request.
         '401':
           description: Failed due to failure in authorization
@@ -203,15 +257,30 @@ paths:
         '200':
           description: Package is deleted.
         '400':
+          content:
+            text/xml:
+              examples:
+                ex:
+                  value: ID not defined
           description: ID not defined, i.e. no such package.
         '401':
           description: Deletion failed due to failure in authorization
+        '404':
+          content:
+            text/xml:
+              examples:
+                ex:
+                  value: Package not found
+          description: Failed. No package matched specified ID
         '500':
           description: Deletion failed due to internal server error.
       operationId: PackageDelete
       summary: Delete the package specified by the ID
     parameters:
-      - name: id
+      - examples:
+          ex:
+            value: 93u09wcdsfsdv
+        name: id
         description: Package ID
         schema:
           $ref: '#/components/schemas/PackageID'
@@ -256,14 +325,19 @@ paths:
                     isSensitive: false
                     url: https://github.com/expressjs/express
                     rating:
-                      BusFactor: '0.99'
-                      Correctness: '0.75'
-                      RampUp: '0.84'
-                      ResponsiveMaintainer: '0.5'
-                      LicenseScore: '1.0'
-                      GoodPinningPractice: '1.0'
+                      BusFactor: 0.99
+                      Correctness: 0.75
+                      RampUp: 0.87
+                      ResponsiveMaintainer: 0.51
+                      LicenseScore: 1
+                      GoodPinningPractice: 1
           description: Success. Check the ID in the returned metadata for the official ID.
         '400':
+          content:
+            text/xml:
+              examples:
+                ex:
+                  value: package with ID already exists
           description: Malformed request.
         '401':
           description: Failed. You are unauthorized to add to the registry
@@ -288,6 +362,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PackageRating'
+              examples:
+                express:
+                  value:
+                    BusFactor: 0.99
+                    GoodPinningPractice: 1
+                    Correctness: 0.75
+                    RampUp: 0.87
+                    LicenseScore: 1
+                    ResponsiveMaintainer: 0.51
           description: Rating. Only use this if each metric was computed successfully.
         '400':
           description: No such package.
@@ -327,6 +410,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AuthReq'
+            examples:
+              admin:
+                value:
+                  User:
+                    name: admin
+                    isAdmin: true
+                  Secret:
+                    password: ece461
         required: true
       servers:
         - url: https://ece461project2-333702.uc.r.appspot.com
@@ -338,6 +429,13 @@ paths:
               schema:
                 type: string
           description: This mean authentication was successfull and access token will be sent
+        '400':
+          content:
+            text/xml:
+              examples:
+                incorrect:
+                  value: Incorrect inputs
+          description: Incorrect inputs
         '401':
           content:
             text/xml:
@@ -346,71 +444,11 @@ paths:
               examples:
                 authFailed:
                   value: No such user or invalid password
-          description: Authentication Failed
+          description: Authentication Failed due to invalid/incorrect input
+        '500':
+          description: Authentication failed due to internal server error
       operationId: createToken
       summary: Authenticate a user
-  /package/byName/{name}:
-    summary: Interact with the package with this name
-    get:
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PackageHistoryEntry'
-              examples:
-                zaza:
-                  value:
-                    id: 1
-                    name: Zaza
-                    tag: cat
-          description: Package history fetched
-        '400':
-          description: No package with that name
-        '401':
-          description: Unable to get package history due to failed authorization
-        '500':
-          description: Failed due to internal server error
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: unexpected error
-      operationId: PackageByNameGet
-      description: Return the history of this package (all versions).
-    delete:
-      parameters:
-        - name: name
-          schema:
-            $ref: '#/components/schemas/PackageName'
-          in: path
-          required: true
-      responses:
-        '200':
-          description: Package is deleted.
-        '400':
-          description: No package with that name
-        '401':
-          description: Unable to delete due to failure in authorization
-        '500':
-          description: Failed due to internal server error
-      operationId: PackageByNameDelete
-      summary: Delete the package specified by name
-    parameters:
-      - name: name
-        schema:
-          $ref: '#/components/schemas/PackageName'
-        in: path
-        required: true
-      - name: X-Authorization
-        description: ''
-        schema:
-          $ref: '#/components/schemas/AuthenticationToken'
-        in: header
-        required: true
   /user:
     servers:
       - url: https://ece461project2-333702.uc.r.appspot.com
@@ -421,6 +459,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/NewUser'
+            examples:
+              user:
+                value:
+                  username: devansh
+                  isAdmin: false
+                  password: wowowowow
         required: true
       servers:
         - url: https://ece461project2-333702.uc.r.appspot.com
@@ -444,14 +488,23 @@ paths:
             $ref: '#/components/schemas/AuthenticationToken'
           in: header
           required: true
+        - examples:
+            dev:
+              value: devansh
+          name: username
+          description: username of the user to be deleted
+          schema:
+            type: string
+          in: path
+          required: true
       responses:
         '200':
           description: |
             User Deleted
-        '400':
-          description: Failed. No user with that username
         '401':
           description: Unable to delete due to invalid authentication token
+        '404':
+          description: Failed. No user with that username
         '500':
           description: Failed to delete due to internal server error
       operationId: usernameDelete
@@ -463,6 +516,104 @@ paths:
         schema:
           type: string
         in: path
+        required: true
+  /package/byName/{name}:
+    summary: Interact with the package with this name
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                express:
+                  value:
+                    - Date: 1639029271208
+                      Action: CREATE
+                      PackageMetadata:
+                        url: https://github.com/expressjs/express
+                        rating:
+                          RampUp: 0.87
+                          BusFactor: 0.99
+                          LicenseScore: 1
+                          ResponsiveMaintainer: 0.51
+                          GoodPinningPractice: 1
+                          Correctness: 0.75
+                        ID: 93u09wcdsfsdv
+                        Version: 4001700001
+                        isSensitive: false
+                        Name: express
+                      User:
+                        isAdmin: true
+                        name: admin
+                    - PackageMetadata:
+                        rating:
+                          Correctness: 0.75
+                          ResponsiveMaintainer: 0.51
+                          BusFactor: 0.99
+                          RampUp: 0.87
+                          GoodPinningPractice: 1
+                          LicenseScore: 1
+                        url: https://github.com/expressjs/express
+                        Version: 4001700001
+                        ID: 93u09wcdsfsdv
+                        isSensitive: false
+                        Name: express
+                      User:
+                        isAdmin: true
+                        name: admin
+                      Date: 1639029284313
+                      Action: RATE
+          description: Package history fetched
+        '400':
+          description: No package with that name
+        '401':
+          description: Unable to get package history due to failed authorization
+        '404':
+          content:
+            text/xml:
+              examples:
+                ex:
+                  value: Package not found
+          description: Failed. No package with given name
+        '500':
+          description: Failed due to internal server error
+      operationId: PackageByNameGet
+      summary: Get package by name
+      description: Return the history of this package (all versions).
+    delete:
+      parameters:
+        - name: name
+          schema:
+            $ref: '#/components/schemas/PackageName'
+          in: path
+          required: true
+      responses:
+        '200':
+          description: Package is deleted.
+        '400':
+          content:
+            text/xml:
+              examples:
+                ex:
+                  value: Could not complete request
+          description: No package with that name
+        '401':
+          description: Unable to delete due to failure in authorization
+        '500':
+          description: Failed due to internal server error
+      operationId: PackageByNameDelete
+      summary: Delete the package specified by name
+    parameters:
+      - name: name
+        schema:
+          $ref: '#/components/schemas/PackageName'
+        in: path
+        required: true
+      - name: X-Authorization
+        description: ''
+        schema:
+          $ref: '#/components/schemas/AuthenticationToken'
+        in: header
         required: true
 components:
   schemas:
@@ -517,7 +668,6 @@ components:
         - On package upload, either Content or URL should be set.
         - On package update, exactly one field should be set.
         - On download, the Content field should be set.
-      # required: []
       type: object
       properties:
         Content:
