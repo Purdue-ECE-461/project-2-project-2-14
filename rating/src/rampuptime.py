@@ -3,6 +3,7 @@ from math import log
 import requests
 from datetime import datetime
 from src.config import *
+import os
 
 NUM_SECONDS_IN_YEAR = 60 * 60 * 24 * 365
 

@@ -4,7 +4,6 @@ sys.dont_write_bytecode = True
 
 from src.config import *
 import sys
-import json
 import os
 from src.installer import installDeps
 
@@ -13,12 +12,14 @@ TEST_DIR = "src/test"
 
 
 if __name__ == '__main__':
-    if (len(sys.argv) < 2):
+    if (len(sys.argv) < 3):
         raise Exception("Incorrect input")
 
     # installDeps()
     URL = sys.argv[1]
     path = sys.argv[2]
+    gtoken = sys.argv[3]
+    setToken(gtoken)
     # print(sys.argv)
 
     files = os.listdir(path)

@@ -487,7 +487,9 @@ function checkRating(rating) {
 function rate(url, packagePath) {
     let data;
     try {
-        data = exec(`rating/run ${url} ${packagePath}`).toString();
+        data = exec(
+            `rating/run ${url} ${packagePath} ${process.env.GITHUB_TOKEN}`
+        ).toString();
         data = data.split(" ");
         data[5] = data[5].slice(0, -1);
     } catch {
