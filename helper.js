@@ -177,7 +177,7 @@ function getUrlFromPackageFiles(packagePath) {
                     return null;
                 }
             } else if (typeof packageJSON.repository === "string") {
-                return packageJSON.repository;
+                return `https://github.com/${packageJSON.repository}`;
             }
             return null;
         } catch {

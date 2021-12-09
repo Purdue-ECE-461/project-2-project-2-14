@@ -1,7 +1,6 @@
 const { __waitFor } = require("../helper");
 const { killServer, serverEvents } = require("../server");
 const fetch = require("node-fetch");
-const fs = require("fs");
 
 let adminAuthKey = null;
 
