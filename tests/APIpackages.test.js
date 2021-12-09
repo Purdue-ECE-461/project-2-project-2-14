@@ -6,9 +6,10 @@ const fs = require("fs");
 let adminAuthKey = null;
 let randomPackageID = null;
 
+console.log(fs.readFileSync(".env"));
+
 describe("API packages test", () => {
     beforeAll(async () => {
-        console.log(fs.readFileSync(".env"));
         await new Promise((resolve, reject) => {
             serverEvents.on("STARTED", () => {
                 resolve();
