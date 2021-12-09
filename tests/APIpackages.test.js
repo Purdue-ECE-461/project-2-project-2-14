@@ -8,6 +8,7 @@ let randomPackageID = null;
 
 describe("API packages test", () => {
     beforeAll(async () => {
+        console.log(fs.readFileSync(".env"));
         await new Promise((resolve, reject) => {
             serverEvents.on("STARTED", () => {
                 resolve();
