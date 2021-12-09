@@ -170,7 +170,16 @@ function getUrlFromPackageFiles(packagePath) {
     if (fs.existsSync(packageJsonFile)) {
         try {
             packageJSON = JSON.parse(fs.readFileSync(packageJsonFile));
-            return `https://github.com/${packageJSON.repository}`;
+            if (typeof packageJSON.repository === "object") {
+                if (packageJSON.repository.url) {
+                    return packageJSON.repository.url;
+                } else {
+                    return null;
+                }
+            } else if (typeof packageJSON.repository === "string") {
+                return packageJSON.repository;
+            }
+            return null;
         } catch {
             return null;
         }

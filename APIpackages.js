@@ -444,6 +444,13 @@ async function addRepo(url, metadata, uploadID) {
     if (!rating) {
         return { error: "Could not rate module" };
     }
+    if (!checkRating(rating)) {
+        return {
+            error:
+                "package did not have the needed score: " +
+                JSON.stringify(rating),
+        };
+    }
     logger.write(
         `Rating package at: ${url} for package with id: ${metadata.ID}`
     );

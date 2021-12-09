@@ -90,6 +90,11 @@ async function deleteUser(req, res) {
         return;
     }
 
+    if (!(await db.checkUser(username))) {
+        res.status(404).send("User does not exist");
+        return;
+    }
+
     await db.deleteUser(username);
 
     res.status(200).send();
