@@ -134,15 +134,15 @@ def calcMetrics(githubURL, path):
             # LOG_FILE.write(f"ERROR IN GETTING RESPONSIVE MAINTENANCE SCORE FOR {githubLink}")
         responsiveMaintenanceScore = -1
 
-    # try:
+    try:
         # if LOG_LEVEL > 1: # pragma: no cover
             # LOG_FILE.write(f"Running correctness check {org}/{package}")
-    correctnessScore = correctness(numStars, basePackageLink)
-    correctnessScore = round(correctnessScore, 2)
-    # except:
+        correctnessScore = correctness(numStars, basePackageLink)
+        correctnessScore = round(correctnessScore, 2)
+    except:
         # if LOG_LEVEL > 0: # pragma: no cover
             # LOG_FILE.write(f"ERROR IN GETTING CORRECTNESS SCORE FOR {githubLink}")
-        # correctnessScore = -1
+        correctnessScore = -1
 
     try:
         dependenciesScore = dependencies(packagePath)
