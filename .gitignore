@@ -8,6 +8,7 @@ tmp/
 .DS_Store
 node_modules
 ece461project2-adminkey.json
+ece461project2-333702-69d952250880.json
 .env
 
 node_modules/.bin/acorn
