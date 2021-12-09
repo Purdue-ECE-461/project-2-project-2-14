@@ -26,6 +26,11 @@ jobs:
                   node-version: ${{ matrix.node-version }}
                   cache: "npm"
             - run: npm ci
+            - name: make key files
+              env:
+                  ENV_FILE: ${{secrets.ENV_FILE}}
+                  ADMIN_JSON: ${{secrets.ADMIN_KEY_JSON}}
+              run: echo $ENV_FILE > .env; echo $ADMIN_JSON > ece461project2-adminkey.json;
             #- name: Run ESLint
             # uses: bradennapier/eslint-plus-action@v3.4.2
             - name: Test

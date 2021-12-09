@@ -79,7 +79,7 @@ def dependencies(path):
         dependencyList = []
 
     if len(dependencyList) == 0:
-            return 0
+            return 1
         
     num = 0
 

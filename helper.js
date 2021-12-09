@@ -2,7 +2,7 @@ const config = require("./config");
 const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
-const spawn = require("child_process").spawn;
+const { spawn, execSync } = require("child_process");
 
 const TOKEN_BYTES = config.TOKEN_BYTES;
 
@@ -123,23 +123,13 @@ async function unzipTmp(uploadID) {
     ) {
         return null;
     }
-    const success = await new Promise((resolve, reject) => {
-        spawn("unzip", [
-            "-o",
-            `${config.TMP_FOLDER}/${uploadID}/${config.TMP_FOLDER}.zip`,
-            "-d",
-            `${config.TMP_FOLDER}/${uploadID}/`,
-        ])
-            .on("exit", function (code) {
-                resolve(true);
-            })
-            .on("error", () => {
-                resolve(false);
-            });
-    });
-    if (!success) {
-        return null;
-    }
+    try {
+        let options = { stdio: "pipe" };
+        execSync(
+            `unzip -o ${config.TMP_FOLDER}/${uploadID}/${config.TMP_FOLDER}.zip -d ${config.TMP_FOLDER}/${uploadID}/`,
+            options
+        );
+    } catch {}
 
     const packageDir = await getUnzippedPackageDir(uploadID);
     if (packageDir === null) {
