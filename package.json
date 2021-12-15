@@ -5,10 +5,10 @@
     "main": "server.js",
     "scripts": {
         "start": "node server.js",
-        "continue": "node server.js --nReset",
-        "test": "jest --runInBand",
+        "reset": "node server.js --reset",
+        "test": "jest --runInBand --coverage --verbose",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-        "coverage": "npx jest --collectCoverage --"
+        "coverage": "npx jest --verbose"
     },
     "repository": {
         "type": "git",

@@ -179,7 +179,7 @@ async function startup(flag) {
     }
     logger.write("Started server");
 }
-let resetFlag = !process.argv.includes("--nReset");
+let resetFlag = process.argv.includes("--reset");
 startup(resetFlag);
 
 function killServer() {
