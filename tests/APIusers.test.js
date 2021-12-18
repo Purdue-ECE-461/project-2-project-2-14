@@ -146,7 +146,7 @@ describe("API users test", () => {
             },
         };
         const response = await fetch(
-            "http://localhost:3000/user/admin",
+            `http://localhost:3000/user/${config.ADMIN_USERNAME}`,
             options
         );
         expect(response.status).toBe(400);
