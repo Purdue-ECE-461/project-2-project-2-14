@@ -2,6 +2,7 @@ const { __waitFor } = require("../helper");
 const { killServer, serverEvents } = require("../server");
 const fetch = require("node-fetch");
 const fs = require("fs");
+const config = require("./../config");
 
 let adminAuthKey = null;
 let randomPackageID = null;
@@ -15,11 +16,11 @@ describe("API packages test", () => {
         });
         const data = {
             User: {
-                name: "admin",
+                name: config.ADMIN_USERNAME,
                 isAdmin: true,
             },
             Secret: {
-                password: "ece461",
+                password: "string",
             },
         };
         const options = {

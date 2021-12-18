@@ -1,16 +1,17 @@
 const { __waitFor } = require("../helper");
 const { killServer, serverEvents } = require("../server");
 const fetch = require("node-fetch");
+const config = require("./../config");
 
 let adminAuthKey = null;
 
 const ADMIN_LOGIN = {
     User: {
-        name: "admin",
+        name: config.ADMIN_USERNAME,
         isAdmin: true,
     },
     Secret: {
-        password: "ece461",
+        password: "string",
     },
 };
 
