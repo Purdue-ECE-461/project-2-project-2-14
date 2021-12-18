@@ -10,7 +10,7 @@ module.exports = {
     PACKAGE_ID_BYTES: 4,
     GITHUB_TOKEN: process.env.GITHUB_TOKEN,
     OFFSET_SIZE: 5,
-    ADMIN_USERNAME: "admin",
+    ADMIN_USERNAME: "Alfalfa",
     TMP_FOLDER: "tmp",
     BUS_FACTOR_SCORE: "BusFactor",
     CORRECTNESS_SCORE: "Correctness",

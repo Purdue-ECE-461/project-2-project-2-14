@@ -15,7 +15,7 @@ app.use(express.json({ limit: "1mb" }));
 app.use(express.static("public"));
 
 app.get(`/`, (req, res) => {
-    res.send("<h1>ECE 461 Project 2 Group 14</h1>");
+    res.send("<h1>ECE 461 Project 2 Group 14: 5</h1>");
 });
 
 // The detailed documentation of these endpoints can be found

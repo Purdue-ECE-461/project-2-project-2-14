@@ -23,7 +23,7 @@ async function init() {
 
     await db.saveUser(
         config.ADMIN_USERNAME,
-        helper.generateHash("ece461"),
+        helper.generateHash("string"),
         true
     );
     await helper.__waitFor(1000);
