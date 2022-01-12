@@ -1,0 +1,1 @@
+{"version":"1.0.0","name":"project-2-project-2-14","dependencies":{"@google-cloud/firestore":{"version":"4.15.1"},"adm-zip":{"version":"0.5.9"},"dotenv":{"version":"10.0.0"},"express":{"version":"4.17.1"},"firebase-admin":{"version":"10.0.0"},"get-github-default-branch-name":{"version":"0.0.4"},"https":{"version":"1.0.0"},"multer":{"version":"1.4.3"}}}

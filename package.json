@@ -1,0 +1,39 @@
+{
+    "name": "project-2-project-2-14",
+    "version": "1.0.0",
+    "description": "",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "reset": "node server.js --reset",
+        "test": "jest --runInBand --coverage --verbose",
+        "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+        "coverage": "npx jest --verbose"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Purdue-ECE-461/project-2-project-2-14.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Purdue-ECE-461/project-2-project-2-14/issues"
+    },
+    "homepage": "https://github.com/Purdue-ECE-461/project-2-project-2-14#readme",
+    "dependencies": {
+        "@google-cloud/firestore": "^4.15.1",
+        "dotenv": "^10.0.0",
+        "express": "^4.17.1",
+        "firebase-admin": "^10.0.0",
+        "get-github-default-branch-name": "0.0.4",
+        "https": "^1.0.0",
+        "multer": "^1.4.3"
+    },
+    "devDependencies": {
+        "eslint": "^8.2.0",
+        "firestore-jest-mock": "^0.17.0",
+        "jest": "^27.3.1",
+        "node-fetch": "2.0"
+    }
+}
